@@ -28,24 +28,26 @@ class Board:
         for r in range(R):
             for c in range(C - (WIN_LENGTH - 1)):
                 if 0 != self.board[r][c] == self.board[r][c + 1] == self.board[r][c + 2] == self.board[r][c + 3]:
-                    return True
+                    return self.board[r][c]
 
         # check vertical
         for c in range(C):
             for r in range(R - (WIN_LENGTH - 1)):
                 if 0 != self.board[r][c] == self.board[r + 1][c] == self.board[r + 2][c] == self.board[r + 3][c]:
-                    return True
+                    return self.board[r][c]
 
         # check diagonal
         for r in range(R - (WIN_LENGTH - 1)):
             for c in range(C - (WIN_LENGTH - 1)):
                 if 0 != self.board[r][c] == self.board[r + 1][c + 1] == \
-                        self.board[r + 2][c + 2] == self.board[r + 3][c + 3] or \
-                        0 != self.board[r][c - 3] == self.board[r + 1][c - 2] == \
+                        self.board[r + 2][c + 2] == self.board[r + 3][c + 3]:
+                    return self.board[r][c]
+
+                if 0 != self.board[r][c - 3] == self.board[r + 1][c - 2] == \
                         self.board[r + 2][c - 2] == self.board[r + 3][c]:
-                    return True
+                    return self.board[r][c - 3]
         # if no win yet
-        return False
+        return 0
 
     def available_moves(self):
         return [i + FIRST_CELL for i in range(C) if self.board[0, i] == 0]

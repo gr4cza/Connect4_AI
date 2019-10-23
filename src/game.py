@@ -10,16 +10,14 @@ def play_game():
         if play_as.lower() in ["o", "x"]:
             if play_as.lower() == "o":
                 player = PLAYER1
-                player_start = PLAYER1
                 break
             elif play_as.lower() == "x":
                 player = PLAYER2
-                player_start = PLAYER2
                 break
         else:
             print("Not a valid choice!")
 
-    while (not board.check_win()) and board.available_moves() != []:
+    while board.check_win() == 0 and board.available_moves() != []:
         if player == PLAYER1:
             print(board)
             while True:
@@ -29,13 +27,14 @@ def play_game():
                     break
         elif player == PLAYER2:
             col = RandomAgent.move(board)
+            print(f'The machine choose: {col}')
             board.add_token(col)
             player = PLAYER1
 
     print('-' * 30)
     print(board)
-    if board.check_win():
-        print(f'{"Player" if player_start == player else "Machine"} wins!')
+    if board.check_win() != 0:
+        print(f'{"O" if board.check_win() == 1 else "X"} wins!')
     else:
         print('Tie!')
 
