@@ -21,8 +21,8 @@ def play_game():
         if player == PLAYER1:
             print(board)
             while True:
-                col = input(f"Choose a column? {board.available_moves()}\n")
-                if board.add_token(int(col)):
+                col = input(f"Choose a column? {[x + 1 for x in board.available_moves()]}\n")
+                if board.add_token(int(col) - 1):
                     player = PLAYER2
                     break
         elif player == PLAYER2:

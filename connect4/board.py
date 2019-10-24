@@ -4,7 +4,6 @@ PLAYER1 = 1
 PLAYER2 = 2
 R = 6
 C = 7
-FIRST_CELL = 1
 WIN_LENGTH = 4
 
 
@@ -14,7 +13,7 @@ class Board:
         self.current_player = PLAYER1
 
     def add_token(self, column):
-        column = column - FIRST_CELL
+        column = column
         if self.board[0, column] != 0:
             print('Invalid move')
             return False
@@ -43,14 +42,14 @@ class Board:
                         self.board[r + 2][c + 2] == self.board[r + 3][c + 3]:
                     return self.board[r][c]
 
-                if 0 != self.board[r][c - 3] == self.board[r + 1][c - 2] == \
-                        self.board[r + 2][c - 2] == self.board[r + 3][c]:
-                    return self.board[r][c - 3]
+                if 0 != self.board[r][c + 3] == self.board[r + 1][c + 2] == \
+                        self.board[r + 2][c + 1] == self.board[r + 3][c]:
+                    return self.board[r][c + 3]
         # if no win yet
         return 0
 
     def available_moves(self):
-        return [i + FIRST_CELL for i in range(C) if self.board[0, i] == 0]
+        return [i for i in range(C) if self.board[0, i] == 0]
 
     def __str__(self):
         table = ''
@@ -65,7 +64,7 @@ class Board:
                 elif cel == 2:
                     row.append('X')
             table += '[' + ', '.join(row) + ']\n'
-        return table  # TODO refactor to string
+        return table
 
     def _first_empty_row(self, column):
         row = 0
