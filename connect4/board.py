@@ -1,5 +1,6 @@
 import numpy as np
 
+NO_ONE = 0
 PLAYER1 = 1
 PLAYER2 = 2
 R = 6
@@ -11,6 +12,7 @@ class Board:
     def __init__(self):
         self.board = np.zeros([R, C], dtype=int)
         self.current_player = PLAYER1
+        self._winner = NO_ONE
 
     def add_token(self, column):
         column = column
@@ -20,33 +22,11 @@ class Board:
         row = self._first_empty_row(column)
         self.board[row, column] = self.current_player
         self.current_player = PLAYER1 if self.current_player != PLAYER1 else PLAYER2
+        self._check_winner(row, column)
         return True
 
     def check_win(self):
-        # check horizontal
-        for r in range(R):
-            for c in range(C - (WIN_LENGTH - 1)):
-                if 0 != self.board[r][c] == self.board[r][c + 1] == self.board[r][c + 2] == self.board[r][c + 3]:
-                    return self.board[r][c]
-
-        # check vertical
-        for c in range(C):
-            for r in range(R - (WIN_LENGTH - 1)):
-                if 0 != self.board[r][c] == self.board[r + 1][c] == self.board[r + 2][c] == self.board[r + 3][c]:
-                    return self.board[r][c]
-
-        # check diagonal
-        for r in range(R - (WIN_LENGTH - 1)):
-            for c in range(C - (WIN_LENGTH - 1)):
-                if 0 != self.board[r][c] == self.board[r + 1][c + 1] == \
-                        self.board[r + 2][c + 2] == self.board[r + 3][c + 3]:
-                    return self.board[r][c]
-
-                if 0 != self.board[r][c + 3] == self.board[r + 1][c + 2] == \
-                        self.board[r + 2][c + 1] == self.board[r + 3][c]:
-                    return self.board[r][c + 3]
-        # if no win yet
-        return 0
+        return self._winner
 
     def available_moves(self):
         return [i for i in range(C) if self.board[0, i] == 0]
@@ -74,3 +54,31 @@ class Board:
                 break
         row = row - 1
         return row
+
+    def _check_winner(self, row, column):
+        # check row
+        for c in range(column - 3 if column - 3 > 0 else 0, column):
+            if self.board[row][c] == self.board[row][c + 1] == self.board[row][c + 2] == self.board[row][c + 3]:
+                self._winner = self.board[row][column]
+
+        # check column
+        if row <= 2:
+            if self.board[row][column] == self.board[row + 1][column] == \
+                    self.board[row + 2][column] == self.board[row + 3][column]:
+                self._winner = self.board[row][column]
+
+        # check negative diagonal
+        if 3 <= column + (5 - row) <= 8:
+            for i in range(4):
+                if column - 3 - i >= 0 and row - 3 - i >= 0 and column + i <= 6 and row + i <= 5:
+                    if self.board[row + i][column + i] == self.board[row - 1 + i][column - 1 + i] == \
+                            self.board[row - 2 + i][column - 2 + i] == self.board[row - 3 + i][column - 3 + i]:
+                        self._winner = self.board[row][column]
+
+        # check positive diagonal
+        if 3 <= column + row <= 8:
+            for i in range(4):
+                if 0 <= column - 3 + i and column + i <= 6 and row - i >= 0 and row + 3 - i <= 5:
+                    if self.board[row - i][column + i] == self.board[row + 1 - i][column - 1 + i] == \
+                            self.board[row + 2 - i][column - 2 + i] == self.board[row + 3 - i][column - 3 + i]:
+                        self._winner = self.board[row][column]
