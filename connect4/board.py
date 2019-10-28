@@ -57,28 +57,32 @@ class Board:
 
     def _check_winner(self, row, column):
         # check row
-        for c in range(column - 3 if column - 3 > 0 else 0, column):
+        for c in range(column - 3 if column - 3 >= 0 else 0, column if column + 3 <= 6 else 3):
             if self.board[row][c] == self.board[row][c + 1] == self.board[row][c + 2] == self.board[row][c + 3]:
                 self._winner = self.board[row][column]
+                print('eq row')
 
         # check column
         if row <= 2:
             if self.board[row][column] == self.board[row + 1][column] == \
                     self.board[row + 2][column] == self.board[row + 3][column]:
                 self._winner = self.board[row][column]
+                print('eq col')
 
         # check negative diagonal
         if 3 <= column + (5 - row) <= 8:
             for i in range(4):
-                if column - 3 - i >= 0 and row - 3 - i >= 0 and column + i <= 6 and row + i <= 5:
+                if 0 <= column - 3 + i and column + i <= 6 and 0 <= row - 3 + i and row + i <= 5:
                     if self.board[row + i][column + i] == self.board[row - 1 + i][column - 1 + i] == \
                             self.board[row - 2 + i][column - 2 + i] == self.board[row - 3 + i][column - 3 + i]:
+                        print('eq neg')
                         self._winner = self.board[row][column]
 
         # check positive diagonal
         if 3 <= column + row <= 8:
             for i in range(4):
-                if 0 <= column - 3 + i and column + i <= 6 and row - i >= 0 and row + 3 - i <= 5:
+                if 0 <= column - 3 + i and column + i <= 6 and 0 <= row - i and row + 3 - i <= 5:
                     if self.board[row - i][column + i] == self.board[row + 1 - i][column - 1 + i] == \
                             self.board[row + 2 - i][column - 2 + i] == self.board[row + 3 - i][column - 3 + i]:
+                        print('eq pos')
                         self._winner = self.board[row][column]
