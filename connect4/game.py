@@ -1,9 +1,12 @@
 from board import Board, PLAYER1, PLAYER2
-from random_agent import RandomAgent
+from evaluator import AdvancedScore
+from min_max_agent import MinMaxAgentWAlphaBeta
 
 
 def play_game():
     board = Board()
+    score = AdvancedScore()
+    ai = MinMaxAgentWAlphaBeta(5, score.score, PLAYER2)
 
     while True:
         play_as = input("Choose token! (\"O\"/\"X\")? Note: \"O\" starts \n")
@@ -17,7 +20,7 @@ def play_game():
         else:
             print("Not a valid choice!")
 
-    while board.check_win() == 0 and board.available_moves() != []:
+    while not board.is_game_over():
         if player == PLAYER1:
             print(board)
             while True:
@@ -26,17 +29,18 @@ def play_game():
                     player = PLAYER2
                     break
         elif player == PLAYER2:
-            col = RandomAgent.move(board)
-            print(f'The machine choose: {col}')
+            col = ai.move(board)
+            print(f'The machine choose: {col + 1}')
             board.add_token(col)
             player = PLAYER1
 
     print('-' * 30)
     print(board)
-    if board.check_win() != 0:
-        print(f'{"O" if board.check_win() == 1 else "X"} wins!')
+    print(board.moves)
+    if board.get_winner() != 0:
+        print(f'{"O" if board.get_winner() == 1 else "X"} wins!')
     else:
-        print('Tie!')
+        print('Draw!')
 
 
 if __name__ == '__main__':
