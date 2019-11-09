@@ -1,5 +1,7 @@
 import random
 
+random.seed(42)
+
 
 class RandomAgent:
     @staticmethod
