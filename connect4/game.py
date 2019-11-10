@@ -1,21 +1,22 @@
+from agent.min_max import MinMaxAgentWAlphaBeta
 from board import Board, PLAYER1, PLAYER2
 from evaluator import AdvancedScore
-from min_max_agent import MinMaxAgentWAlphaBeta
 
 
 def play_game():
     board = Board()
     score = AdvancedScore()
-    ai = MinMaxAgentWAlphaBeta(5, score.score, PLAYER2)
 
     while True:
-        play_as = input("Choose token! (\"O\"/\"X\")? Note: \"O\" starts \n")
+        play_as = input('Choose token! ("O"/"X")? Note: "O" starts \n')
         if play_as.lower() in ["o", "x"]:
             if play_as.lower() == "o":
                 player = PLAYER1
+                ai = MinMaxAgentWAlphaBeta(7, score.score, PLAYER2)
                 break
             elif play_as.lower() == "x":
                 player = PLAYER2
+                ai = MinMaxAgentWAlphaBeta(7, score.score, PLAYER1)
                 break
         else:
             print("Not a valid choice!")
