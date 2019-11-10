@@ -14,15 +14,16 @@ class MinMaxAgent(object):
         self.player = player
         self.depth = depth
         self.calculate_score = calculate_score
+        self.time_penalty = 0.99
 
     def move(self, board):
         score, move = self._min_max(board, self.depth, MAX_PLAYER)
-        print(f'choose score{score}')
+        # print(f'choose score{score}')
         return move
 
     def _min_max(self, board, depth, min_max_player):
         if depth == 0 or board.is_game_over():
-            return self._score(board, min_max_player)
+            return self._score(board)
 
         if min_max_player == MAX_PLAYER:
             max_score = -math.inf
@@ -51,28 +52,30 @@ class MinMaxAgent(object):
                     column = col
             return min_score, column
 
-    def _score(self, board, min_max_player):
+    def _score(self, board):
         if board.is_game_over():
             winner = board.get_winner()
             if winner == self.player:
-                return 10_000, None
+                score = 100
             elif winner == NO_ONE:
-                return 0, None
+                score = 0
             else:
-                return -10_000, None
+                score = -100
         else:
-            return self.calculate_score(board.board, self.player), None
+            score = self.calculate_score(board.board, self.player)
+
+        return score, None
 
 
 class MinMaxAgentWAlphaBeta(MinMaxAgent):
     def move(self, board):
         score, move = self._min_max_alpha_beta(board, self.depth, -math.inf, math.inf, MAX_PLAYER)
-        print(f'choose score {score}')
+        # print(f'ai choose score: {score:.4f}')
         return move
 
     def _min_max_alpha_beta(self, board, depth, alpha, beta, min_max_player):
         if depth == 0 or board.is_game_over():
-            return self._score(board, min_max_player)
+            return self._score(board)
 
         if min_max_player == MAX_PLAYER:
             max_score = -math.inf
@@ -81,7 +84,8 @@ class MinMaxAgentWAlphaBeta(MinMaxAgent):
             for col in available_moves:
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
-                score = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MIN_PLAYER)[0]
+                score, _ = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MIN_PLAYER)
+                score *= self.time_penalty
                 if max_score < score:
                     max_score = score
                     column = col
@@ -97,11 +101,12 @@ class MinMaxAgentWAlphaBeta(MinMaxAgent):
             for col in available_moves:
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
-                score = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MAX_PLAYER)[0]
+                score, _ = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MAX_PLAYER)
+                score *= self.time_penalty
                 if min_score > score:
                     min_score = score
                     column = col
-                alpha = min(alpha, min_score)
+                beta = min(beta, min_score)
                 if alpha >= beta:
                     break
             return min_score, column
