@@ -47,14 +47,18 @@ class AdvancedScore:
         for com in combinations:
             p1_count = com.count(PLAYER1)
             p2_count = com.count(PLAYER2)
+            if p1_count == 1 and p2_count == 0:
+                point_dict[com] = 1
+            elif p2_count == 1 and p1_count == 0:
+                point_dict[com] = -1
             if p1_count == 2 and p2_count == 0:
-                point_dict[com] = 2
+                point_dict[com] = 3
             elif p2_count == 2 and p1_count == 0:
-                point_dict[com] = -2
+                point_dict[com] = -3
             elif p1_count == 3 and p2_count == 0:
-                point_dict[com] = 10
+                point_dict[com] = 12
             elif p2_count == 3 and p1_count == 0:
-                point_dict[com] = -10
+                point_dict[com] = -12
             else:
                 point_dict[com] = 0
 
