@@ -2,7 +2,7 @@ import numpy as np
 
 NO_ONE = 0
 PLAYER1 = 1
-PLAYER2 = -1
+PLAYER2 = 2
 R = 6
 C = 7
 
@@ -97,3 +97,12 @@ class Board:
                     if self.board[row - i][column + i] == self.board[row + 1 - i][column - 1 + i] == \
                             self.board[row + 2 - i][column - 2 + i] == self.board[row + 3 - i][column - 3 + i]:
                         self._winner = self.board[row][column]
+
+    def get_moves(self):
+        return self._moves
+
+    def get_hash(self):
+        return np.array2string(self.board.flatten(), separator='')[1:-1]
+
+    def __hash__(self):
+        return hash(np.array2string(self.board.flatten(), separator='')[1:-1])
