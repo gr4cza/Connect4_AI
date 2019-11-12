@@ -14,13 +14,20 @@ class QLearn(object):
         self._states_value = self._load_learn_dict(source_name)
 
     def move(self, board):
-        max_score = -math.inf
-        column = None
-        for col in board.available_moves():
-            score = self._get_state_value(board.get_moves(), board.get_hash(), col)
-            if score >= max_score:
-                max_score = score
-                column = col
+        b_hash = board.get_hash()
+        available = board.available_moves()
+        scores = [(self._get_state_value(board.get_moves(), b_hash, col), col) for col in available]
+        if max(s[0] for s in scores) == 0:
+            column = random.choice([s[1] for s in scores if s[0] == 0])
+            self._get_state_value(board.get_moves(), b_hash, column)
+        else:
+            max_score = -math.inf
+            column = None
+            for col in board.available_moves():
+                score = self._get_state_value(board.get_moves(), b_hash, col)
+                if score >= max_score:
+                    max_score = score
+                    column = col
         return column
 
     @staticmethod
@@ -85,18 +92,24 @@ class QLearnTrain(QLearn):
         p1, p2, d = 0, 0, 0
 
         for i in range(iterations):
-            if i % (iterations / 10) == 0:
+            if i % (iterations / 20) == 0:
                 print(f'iteration: {i}.')
-            if i % 10 == 0:
+            if i % (iterations / 1000) == 0:
                 self._win_loose.append((p1, p2, d))
 
             board = Board()
             while not board.is_game_over():
                 if current_player == PLAYER1:
-                    column = self.move(board)
+                    if self.player == PLAYER1:
+                        column = self.move(board)
+                    else:
+                        column = against.move(board)
                     current_player = PLAYER2
                 else:
-                    column = against.move(board)
+                    if self.player == PLAYER2:
+                        column = self.move(board)
+                    else:
+                        column = against.move(board)
                     current_player = PLAYER1
                 board.add_token(column)
 
@@ -117,7 +130,8 @@ class QLearnTrain(QLearn):
                 p2 += 1
 
         print(f'p1: {p1}, p2: {p2}, d: {d}')
-        self._save_learn_dict(name)
+
+        self._save_learn_dict(name + ('_p1' if self_play else ''))
         if self_play:
             against._save_learn_dict(name + '_p2')
 
@@ -138,7 +152,7 @@ class QLearnTrain(QLearn):
         print(f'save model as: {file_name}')
         with open(f'models/{file_name}.pkl', 'wb') as f:
             pickle.dump(self._states_value, f)
-        with open(f'models/{file_name}_learning_rate.pkl', 'wb') as f:
+        with open(f'models/learning/{file_name}_learning_rate.pkl', 'wb') as f:
             pickle.dump(self._win_loose, f)
 
     def _get_state_value(self, moves, board, action):
