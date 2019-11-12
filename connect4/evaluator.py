@@ -63,8 +63,3 @@ class AdvancedScore:
                 point_dict[com] = 0
 
         return point_dict
-
-
-if __name__ == '__main__':
-    a = AdvancedScore()
-    print(a.point_dict)
