@@ -20,17 +20,18 @@ class Board:
         self.moves = []  # for debug purposes
 
     def add_token(self, column):
-        column = column
-        if self.board[0, column] != 0:
-            print('Invalid move')
-            return False
-        row = self._first_empty_row(column)
-        self.board[row, column] = self.current_player
-        self.current_player = PLAYER1 if self.current_player != PLAYER1 else PLAYER2
-        self._check_winner(row, column)
-        self._moves += 1
-        self.moves.append(column)
-        return True
+        if self._winner == NO_ONE:
+            if self.board[0, column] != 0:
+                print('Invalid move')
+                return False
+            row = self._first_empty_row(column)
+            self.board[row, column] = self.current_player
+            self.current_player = PLAYER1 if self.current_player != PLAYER1 else PLAYER2
+            self._check_winner(row, column)
+            self._moves += 1
+            self.moves.append(column)
+            return True
+        return False
 
     def is_game_over(self):
         return not self._winner == 0 or not self._moves <= R * C - 1
