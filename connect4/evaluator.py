@@ -1,5 +1,7 @@
 from itertools import product
 
+from numpy import count_nonzero
+
 from board import NO_ONE, PLAYER1, PLAYER2, R, C
 
 
@@ -38,6 +40,8 @@ class AdvancedScore:
                                  (board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3])] * parity
                 sum_score += self.point_dict[
                                  (board[r][c - 3], board[r + 1][c - 2], board[r + 2][c - 1], board[r + 3][c])] * parity
+
+        sum_score += count_nonzero(board[:][3] == player) * 0.1
         return sum_score
 
     @staticmethod
