@@ -40,7 +40,10 @@ class Board:
         return self._winner
 
     def available_moves(self):
-        return [i for i in range(C) if self.board[0, i] == 0]
+        if self._winner == NO_ONE:
+            return [i for i in range(C) if self.row_counter[i] >= 0]
+        else:
+            return []
 
     def __str__(self):
         table = ''
@@ -64,6 +67,7 @@ class Board:
         copy_obj.current_player = self.current_player
         copy_obj._moves = self._moves
         copy_obj.row_counter = self.row_counter.copy()
+        copy_obj._winner = self._winner
         return copy_obj
 
     def _first_empty_row(self, column):
