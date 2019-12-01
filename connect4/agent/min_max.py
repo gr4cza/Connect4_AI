@@ -17,19 +17,18 @@ class MinMaxAgent(object):
         self.time_penalty = 0.99
 
     def move(self, board):
-        score, move = self._min_max(board, self.depth, MAX_PLAYER)
-        # print(f'choose score{score}')
+        score, move = self._min_max(board, self.depth)
+        # print(f'ai choose score: {score:.4f}')
         return move
 
-    def _min_max(self, board, depth, min_max_player):
+    def _min_max(self, board, depth, min_max_player=MAX_PLAYER):
         if depth == 0 or board.is_game_over():
             return self._score(board)
 
         if min_max_player == MAX_PLAYER:
             max_score = -math.inf
-            available_moves = board.available_moves()
-            column = random.choice(available_moves)
-            for col in available_moves:
+            column = None
+            for col in board.available_moves():
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
                 score, _ = self._min_max(board_copy, depth - 1, MIN_PLAYER)
@@ -40,9 +39,8 @@ class MinMaxAgent(object):
 
         if min_max_player == MIN_PLAYER:
             min_score = +math.inf
-            available_moves = board.available_moves()
-            column = random.choice(available_moves)
-            for col in available_moves:
+            column = None
+            for col in board.available_moves():
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
                 score, _ = self._min_max(board_copy, depth - 1, MAX_PLAYER)
@@ -68,23 +66,17 @@ class MinMaxAgent(object):
 
 
 class MinMaxAgentWAlphaBeta(MinMaxAgent):
-    def move(self, board):
-        score, move = self._min_max_alpha_beta(board, self.depth, -math.inf, math.inf, MAX_PLAYER)
-        # print(f'ai choose score: {score:.4f}')
-        return move
-
-    def _min_max_alpha_beta(self, board, depth, alpha, beta, min_max_player):
+    def _min_max(self, board, depth, alpha=-math.inf, beta=math.inf, min_max_player=MAX_PLAYER):
         if depth == 0 or board.is_game_over():
             return self._score(board)
 
         if min_max_player == MAX_PLAYER:
             max_score = -math.inf
-            available_moves = board.available_moves()
-            column = random.choice(available_moves)
-            for col in available_moves:
+            column = None
+            for col in board.available_moves():
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
-                score, _ = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MIN_PLAYER)
+                score, _ = self._min_max(board_copy, depth - 1, alpha, beta, MIN_PLAYER)
                 score *= self.time_penalty
                 if max_score < score:
                     max_score = score
@@ -96,12 +88,11 @@ class MinMaxAgentWAlphaBeta(MinMaxAgent):
 
         if min_max_player == MIN_PLAYER:
             min_score = +math.inf
-            available_moves = board.available_moves()
-            column = random.choice(available_moves)
-            for col in available_moves:
+            column = None
+            for col in board.available_moves():
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
-                score, _ = self._min_max_alpha_beta(board_copy, depth - 1, alpha, beta, MAX_PLAYER)
+                score, _ = self._min_max(board_copy, depth - 1, alpha, beta, MAX_PLAYER)
                 score *= self.time_penalty
                 if min_score > score:
                     min_score = score
