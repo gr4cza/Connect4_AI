@@ -68,9 +68,12 @@ class MonteCarlo(object):
         root = Node(board, self.player)
         for _ in range(self.turns):
             node = self._select_best_node(root)
-            new_node = node.expand()
-            winner = new_node.simulate()
-            new_node.back_propagate(winner)
+            if not node.board.is_game_over():
+                new_node = node.expand()
+                winner = new_node.simulate()
+                new_node.back_propagate(winner)
+            else:
+                node.back_propagate(node.board.get_winner())
         return self._best_move(root)
 
     @staticmethod
@@ -79,6 +82,6 @@ class MonteCarlo(object):
         return key
 
     def _select_best_node(self, node) -> Node:
-        if None in node.children.values():
+        if None in node.children.values() or len(node.children) == 0:
             return node
         return self._select_best_node(max(node.children.values(), key=lambda x: x.UTC()))
