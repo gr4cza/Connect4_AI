@@ -15,7 +15,7 @@ class AdvancedScore:
     def __init__(self):
         self.point_dict = self.generate_points()
 
-    def score(self, board, player):
+    def score(self, board, player, middle=True):
         sum_score = 0
         parity = 1
         if player != PLAYER1:
@@ -41,7 +41,8 @@ class AdvancedScore:
                 sum_score += self.point_dict[
                                  (board[r][c - 3], board[r + 1][c - 2], board[r + 2][c - 1], board[r + 3][c])] * parity
 
-        sum_score += count_nonzero(board[:][3] == player) * 0.1
+        if middle:
+            sum_score += count_nonzero(board[-1][3] == player)
         return sum_score
 
     @staticmethod
@@ -51,10 +52,6 @@ class AdvancedScore:
         for com in combinations:
             p1_count = com.count(PLAYER1)
             p2_count = com.count(PLAYER2)
-            if p1_count == 1 and p2_count == 0:
-                point_dict[com] = 1
-            elif p2_count == 1 and p1_count == 0:
-                point_dict[com] = -1
             if p1_count == 2 and p2_count == 0:
                 point_dict[com] = 3
             elif p2_count == 2 and p1_count == 0:
