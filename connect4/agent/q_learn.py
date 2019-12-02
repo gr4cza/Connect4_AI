@@ -28,7 +28,7 @@ class QLearn(object):
                 if score >= max_score:
                     max_score = score
                     column = col
-        return column
+        return column, max_score
 
     @staticmethod
     def _load_learn_dict(source_name):

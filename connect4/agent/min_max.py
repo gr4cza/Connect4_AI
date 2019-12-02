@@ -10,10 +10,10 @@ random.seed(42)
 
 
 class MinMaxAgent(object):
-    def __init__(self, depth, calculate_score):
+    def __init__(self, depth, score_function):
         self.player = NO_ONE
         self.depth = depth
-        self.calculate_score = calculate_score
+        self.score_function = score_function
         self.time_penalty = 0.99
 
     def move(self, board):
@@ -60,7 +60,7 @@ class MinMaxAgent(object):
             else:
                 score = -100
         else:
-            score = self.calculate_score(board.board, self.player)
+            score = self.score_function(board.board, self.player)
         return score, None
 
 
