@@ -110,4 +110,4 @@ class Board:
         return np.array2string(self.board.flatten(), separator='')[1:-1]
 
     def __hash__(self):
-        return hash(np.array2string(self.board.flatten(), separator='')[1:-1])
+        return hash(self.get_hash())
