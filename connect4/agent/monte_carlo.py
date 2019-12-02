@@ -7,7 +7,7 @@ from random import choice
 import numpy as np
 
 from agent.random_agent import RandomAgent
-from board import PLAYER1, PLAYER2
+from board import PLAYER1, PLAYER2, NO_ONE
 
 CR = 1.4142  # ~ sqrt(2)
 random_a = RandomAgent()
@@ -57,9 +57,9 @@ class Node(object):
 
 
 class MonteCarlo(object):
-    def __init__(self, player, turns) -> None:
+    def __init__(self, turns) -> None:
         self.turns = turns
-        self.player = player
+        self.player = NO_ONE
 
     def move(self, board):
         return self._monte_carlo(board)

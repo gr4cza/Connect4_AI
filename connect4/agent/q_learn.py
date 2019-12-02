@@ -9,7 +9,7 @@ random.seed(42)
 
 
 class QLearn(object):
-    def __init__(self, player, source_name=None):
+    def __init__(self, player=PLAYER1, source_name=None):
         self.player = player
         self._states_value = self._load_learn_dict(source_name)
 
@@ -52,7 +52,7 @@ class QLearn(object):
 
 
 class QLearnTrain(QLearn):
-    def __init__(self, player, source_name=None):
+    def __init__(self, player=PLAYER1, source_name=None):
         super().__init__(player, source_name)
         self.states = []
         self.learning_rate = 0.2
@@ -66,19 +66,7 @@ class QLearnTrain(QLearn):
             column = random.choice(board.available_moves())
             self._get_state_value(board.get_moves(), b_hash, column)
         else:
-            available = board.available_moves()
-            scores = [(self._get_state_value(board.get_moves(), b_hash, col), col) for col in available]
-            if max(s[0] for s in scores) == 0:
-                column = random.choice([s[1] for s in scores if s[0] == 0])
-                self._get_state_value(board.get_moves(), b_hash, column)
-            else:
-                max_score = -math.inf
-                column = None
-                for col in available:
-                    score = self._get_state_value(board.get_moves(), b_hash, col)
-                    if score >= max_score:
-                        max_score = score
-                        column = col
+            column = super().move(board)
         self.states.append((board.get_moves(), b_hash, column))
         return column
 
@@ -144,7 +132,7 @@ class QLearnTrain(QLearn):
             reward = -1.0
         for num_move, board, action in reversed(self.states):
             self._states_value[num_move][board][action] += self.learning_rate * (
-                    self.gamma_decay * reward - self._states_value[num_move][board][action])
+                    self.gamma_decay * reward - self._states_value[num_move][board][action])  # TODO rework
             reward = self._states_value[num_move][board][action]
 
     def _save_learn_dict(self, name):
