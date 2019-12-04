@@ -8,12 +8,12 @@ from board import Board, PLAYER1, PLAYER2, NO_ONE
 
 SPACING = 2
 
-RED = (255, 0, 0)
+RED = (220, 0, 0)
 
-YELLOW = (255, 255, 0)
+YELLOW = (238, 219, 4)
 
-BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
+BACKGROUND = (255, 255, 255)
+BLUE = (0, 123, 255)
 
 TOKEN_SIZE = 100
 WIDTH = 7 * (TOKEN_SIZE + SPACING)
@@ -55,10 +55,10 @@ class GameUI(object):
 
         for r in range(row):
             for c in range(column):
-                pygame.draw.circle(self.screen, BLACK,
+                pygame.draw.circle(self.screen, BACKGROUND,
                                    (c * (TOKEN_SIZE + SPACING) + radius, (r + 1) * TOKEN_SIZE + radius),
                                    (radius - 4))
-                token_color = BLACK
+                token_color = BACKGROUND
                 if b[r][c] == PLAYER1:
                     token_color = YELLOW
                 elif b[r][c] == PLAYER2:
@@ -95,7 +95,7 @@ class PlayerUI(object):
                     sys.exit()
 
                 if event.type == pygame.MOUSEMOTION:
-                    pygame.draw.rect(screen, BLACK, (0, 0, WIDTH, TOKEN_SIZE))
+                    pygame.draw.rect(screen, BACKGROUND, (0, 0, WIDTH, TOKEN_SIZE))
                     posx = event.pos[0]
                     color = YELLOW if board.current_player == PLAYER1 else RED
                     pygame.draw.circle(screen, color, (posx, int(TOKEN_SIZE / 2)), int(TOKEN_SIZE / 2) - 2)
@@ -106,7 +106,7 @@ class PlayerUI(object):
                     if column in legal_moves:
                         col = column
                         choose = True
-                        pygame.draw.rect(screen, BLACK, (0, 0, WIDTH, TOKEN_SIZE))
+                        pygame.draw.rect(screen, BACKGROUND, (0, 0, WIDTH, TOKEN_SIZE))
         return col
 
 
