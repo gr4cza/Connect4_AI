@@ -16,15 +16,15 @@ class QLearn(object):
     def move(self, board):
         b_hash = board.get_hash()
         available = board.available_moves()
-        scores = [(self._get_state_value(board.get_moves(), b_hash, col), col) for col in available]
+        scores = [(self._get_state_value(board.move_count, b_hash, col), col) for col in available]
+        max_score = -math.inf
         if max(s[0] for s in scores) == 0:
             column = random.choice([s[1] for s in scores if s[0] == 0])
-            self._get_state_value(board.get_moves(), b_hash, column)
+            self._get_state_value(board.move_count, b_hash, column)
         else:
-            max_score = -math.inf
             column = None
             for col in board.available_moves():
-                score = self._get_state_value(board.get_moves(), b_hash, col)
+                score = self._get_state_value(board.move_count, b_hash, col)
                 if score >= max_score:
                     max_score = score
                     column = col
@@ -64,10 +64,10 @@ class QLearnTrain(QLearn):
         b_hash = board.get_hash()
         if random.uniform(0, 1) <= self.exploration_rate:
             column = random.choice(board.available_moves())
-            self._get_state_value(board.get_moves(), b_hash, column)
+            self._get_state_value(board.move_count, b_hash, column)
         else:
             column = super().move(board)
-        self.states.append((board.get_moves(), b_hash, column))
+        self.states.append((board.move_count, b_hash, column))
         return column
 
     def learn(self, iterations=100, against=None, name=''):
@@ -101,7 +101,7 @@ class QLearnTrain(QLearn):
                     current_player = PLAYER1
                 board.add_token(column)
 
-            winner = board.get_winner()
+            winner = board.winner
 
             self._feed_reward(winner)
             self._reset()

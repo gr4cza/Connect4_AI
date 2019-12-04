@@ -52,7 +52,7 @@ class MinMaxAgent(object):
 
     def _score(self, board):
         if board.is_game_over():
-            winner = board.get_winner()
+            winner = board.winner
             if winner == self.player:
                 score = 100
             elif winner == NO_ONE:

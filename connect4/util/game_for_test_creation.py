@@ -4,7 +4,7 @@ from board import Board
 def play_game():
     board = Board()
     moves = []
-    while board.get_winner() == 0 and board.available_moves() != []:
+    while board.winner == 0 and board.available_moves() != []:
         col = input()
         if col == "b":
             break

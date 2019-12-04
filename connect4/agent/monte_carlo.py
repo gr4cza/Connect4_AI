@@ -44,7 +44,7 @@ class Node(object):
         while not board.is_game_over():
             col = random_a.move(board)
             board.add_token(col)
-        return board.get_winner()
+        return board.winner
 
     def back_propagate(self, winner):
         self.plays += 1
@@ -73,7 +73,7 @@ class MonteCarlo(object):
                 winner = new_node.simulate()
                 new_node.back_propagate(winner)
             else:
-                node.back_propagate(node.board.get_winner())
+                node.back_propagate(node.board.winner)
         return self._best_move(root)
 
     @staticmethod

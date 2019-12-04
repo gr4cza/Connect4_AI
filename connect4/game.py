@@ -30,8 +30,8 @@ def play_game():
     print('-' * 30)
     print(board)
     print(board.moves)
-    if board.get_winner() != 0:
-        print(f'{"O" if board.get_winner() == PLAYER1 else "X"} wins!')
+    if board.winner != 0:
+        print(f'{"O" if board.winner == PLAYER1 else "X"} wins!')
     else:
         print('Draw!')
 
