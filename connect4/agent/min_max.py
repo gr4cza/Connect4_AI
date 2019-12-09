@@ -1,12 +1,10 @@
 import math
-import random
 from copy import deepcopy
 
 from board import NO_ONE
 
 MAX_PLAYER = 1
 MIN_PLAYER = -1
-random.seed(42)
 
 
 class MinMaxAgent(object):
@@ -32,6 +30,7 @@ class MinMaxAgent(object):
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
                 score, _ = self._min_max(board_copy, depth - 1, MIN_PLAYER)
+                score *= self.time_penalty
                 if max_score < score:
                     max_score = score
                     column = col
@@ -44,6 +43,7 @@ class MinMaxAgent(object):
                 board_copy = deepcopy(board)
                 board_copy.add_token(col)
                 score, _ = self._min_max(board_copy, depth - 1, MAX_PLAYER)
+                score *= self.time_penalty
                 min_score = min(min_score, score)
                 if min_score > score:
                     min_score = score

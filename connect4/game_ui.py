@@ -4,16 +4,15 @@ import sys
 import pygame
 
 from agent.monte_carlo import MonteCarlo
+from agent.random_agent import RandomAgent
 from board import Board, PLAYER1, PLAYER2, NO_ONE
 
 SPACING = 2
 
-RED = (220, 0, 0)
-
-YELLOW = (238, 219, 4)
-
 BACKGROUND = (255, 255, 255)
 BLUE = (0, 123, 255)
+RED = (220, 0, 0)
+YELLOW = (238, 219, 4)
 
 TOKEN_SIZE = 100
 WIDTH = 7 * (TOKEN_SIZE + SPACING)
@@ -26,12 +25,16 @@ class GameUI(object):
         self.p1 = p1
         self.p1.player, self.p2.player = PLAYER1, PLAYER2
         self.game_over = False
+
+        icon = pygame.image.load('util/icon.png')
+        pygame.display.set_icon(icon)
+        pygame.display.set_caption('Connect 4')
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     def game_loop(self):
         board = Board()
         turn = PLAYER1
-        self._draw_board(board)
+        self.__draw_board(board)
         while not self.game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -44,10 +47,14 @@ class GameUI(object):
                 self._choose(board, turn)
                 turn = PLAYER1
             if board.is_game_over():
+                if board.winner == NO_ONE:
+                    print('Draw')
+                else:
+                    print(f'Winner: {board.winner}. player')
                 pygame.time.wait(5000)
                 self.game_over = True
 
-    def _draw_board(self, board):
+    def __draw_board(self, board):
         radius = int(TOKEN_SIZE / 2)
         b = board.board
         row, column = b.shape
@@ -76,7 +83,7 @@ class GameUI(object):
         else:
             col = self.p2.move(board)
             board.add_token(col)
-        self._draw_board(board)
+        self.__draw_board(board)
 
 
 class PlayerUI(object):
@@ -111,5 +118,5 @@ class PlayerUI(object):
 
 
 if __name__ == '__main__':
-    game = GameUI(MonteCarlo(5_000), MonteCarlo(10_000))
+    game = GameUI(PlayerUI, MonteCarlo(2000))
     game.game_loop()

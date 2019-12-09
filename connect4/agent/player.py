@@ -22,6 +22,12 @@ class Player(object):
     def move(board):
         print(board)
         while True:
-            col = input(f"Choose a column? {[x + 1 for x in board.available_moves()]}\n")
-            break
-        return int(col) - 1
+            a_moves = board.available_moves()
+            col = input(f"Choose a column! {[x + 1 for x in board.available_moves()]}\n")
+            col = col if col.isdigit() else -1
+            col = int(col)
+            if col-1 in a_moves:
+                break
+            else:
+                print('Invalid input')
+        return col - 1

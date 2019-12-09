@@ -39,13 +39,15 @@ class MyTestCase(unittest.TestCase):
                                            '[O, O, X,  ,  ,  , O]\n'))
 
     def test_invalid_moves(self):
-        self.board.board = np.array([[NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE],
-                                     [NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE],
-                                     [NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE],
-                                     [NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE],
-                                     [NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE],
-                                     [NO_ONE, NO_ONE, NO_ONE, PLAYER2, NO_ONE, NO_ONE, NO_ONE]])
-        self.assertFalse(self.board.add_token(3))
+        for i in [1, 1, 1, 1, 1, 1]:
+            self.board.add_token(i)
+        self.assertEqual(str(self.board), ('[ , X,  ,  ,  ,  ,  ]\n'
+                                           '[ , O,  ,  ,  ,  ,  ]\n'
+                                           '[ , X,  ,  ,  ,  ,  ]\n'
+                                           '[ , O,  ,  ,  ,  ,  ]\n'
+                                           '[ , X,  ,  ,  ,  ,  ]\n'
+                                           '[ , O,  ,  ,  ,  ,  ]\n'))
+        self.assertFalse(self.board.add_token(1))
 
     def test_empty_board_available_moves(self):
         self.assertEqual(self.board.available_moves(), [0, 1, 2, 3, 4, 5, 6])
@@ -83,6 +85,7 @@ class MyTestCase(unittest.TestCase):
                                            '[ , X, O,  ,  ,  ,  ]\n'
                                            '[ , X, O,  ,  ,  ,  ]\n'))
         self.assertEqual(self.board.is_game_over(), True)
+        self.assertFalse(self.board.add_token(3))
         self.assertEqual(self.board.available_moves(), [])
 
     def test_no_winner_board(self):

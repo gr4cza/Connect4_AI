@@ -8,9 +8,11 @@ from evaluator import AdvancedScore
 def play_game():
     board = Board()
     score = AdvancedScore()
+    player = PLAYER1
+
     p = Player()
     p2 = Player()
-    player = PLAYER1
+
     ai_1 = MinMaxAgentWAlphaBeta(6, score.score)
     ai_2 = MonteCarlo(10_000)
 

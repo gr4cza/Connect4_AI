@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from copy import deepcopy
 from math import sqrt
 from random import choice
@@ -9,7 +10,7 @@ import numpy as np
 from agent.random_agent import RandomAgent
 from board import PLAYER1, PLAYER2, NO_ONE
 
-CR = 1.4142  # ~ sqrt(2)
+CR = math.sqrt(2)
 random_a = RandomAgent()
 
 

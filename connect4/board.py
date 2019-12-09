@@ -21,20 +21,20 @@ class Board:
 
     def add_token(self, column):
         if self.winner == NO_ONE:
-            if self.board[0, column] != 0:
+            if self.row_counter[column] < 0:
                 print('Invalid move')
                 return False
-            row = self._first_empty_row(column)
+            row = self.__first_empty_row(column)
             self.board[row, column] = self.current_player
             self.current_player = PLAYER1 if self.current_player != PLAYER1 else PLAYER2
-            self._check_winner(row, column)
+            self.__check_winner(row, column)
             self.move_count += 1
             self.moves.append(column)
             return True
         return False
 
     def is_game_over(self):
-        return not self.winner == 0 or not self.move_count <= R * C - 1
+        return not self.winner == NO_ONE or not self.move_count <= R * C - 1
 
     def available_moves(self):
         if self.winner == NO_ONE:
@@ -67,12 +67,12 @@ class Board:
         copy_obj.winner = self.winner
         return copy_obj
 
-    def _first_empty_row(self, column):
+    def __first_empty_row(self, column):
         row = self.row_counter[column]
         self.row_counter[column] -= 1
         return row
 
-    def _check_winner(self, row, column):
+    def __check_winner(self, row, column):
         # check row
         for c in range(column - 3 if column - 3 >= 0 else 0, column + 1 if column + 3 < 6 else 4):
             if self.board[row][c] == self.board[row][c + 1] == self.board[row][c + 2] == self.board[row][c + 3]:
