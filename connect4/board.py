@@ -100,8 +100,6 @@ class Board:
                             self.board[row + 2 - i][column - 2 + i] == self.board[row + 3 - i][column - 3 + i]:
                         self.winner = self.board[row][column]
 
+    # for debug
     def get_hash(self):
         return np.array2string(self.board.flatten(), separator='')[1:-1]
-
-    def __hash__(self):
-        return hash(self.get_hash())
