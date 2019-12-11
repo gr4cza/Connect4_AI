@@ -1,4 +1,5 @@
 import math
+import os
 import pickle
 import random
 from datetime import datetime
@@ -9,8 +10,8 @@ random.seed(42)
 
 
 class QLearn(object):
-    def __init__(self, player=PLAYER1, source_name=None):
-        self.player = player
+    def __init__(self, source_name=None):
+        self.player = NO_ONE
         self._states_value = self._load_learn_dict(source_name)
 
     def move(self, board):
@@ -28,7 +29,7 @@ class QLearn(object):
                 if score >= max_score:
                     max_score = score
                     column = col
-        return column, max_score
+        return column
 
     @staticmethod
     def _load_learn_dict(source_name):
@@ -52,13 +53,15 @@ class QLearn(object):
 
 
 class QLearnTrain(QLearn):
-    def __init__(self, player=PLAYER1, source_name=None):
-        super().__init__(player, source_name)
-        self.states = []
+    def __init__(self, source_name=None):
+        super().__init__(source_name)
+        self.player = PLAYER1
+        self._states = []
         self.learning_rate = 0.2
         self.exploration_rate = 0.3
         self.gamma_decay = 0.9
-        self._win_loose = []
+        self.win_loose = []
+        self.resolution = 100
 
     def move(self, board):
         b_hash = board.get_hash()
@@ -67,44 +70,39 @@ class QLearnTrain(QLearn):
             self._get_state_value(board.move_count, b_hash, column)
         else:
             column = super().move(board)
-        self.states.append((board.move_count, b_hash, column))
+        self._states.append((board.move_count, b_hash, column))
         return column
 
     def learn(self, iterations=100, against=None, name=''):
         current_player = PLAYER1
         self_play = False
-        if not against:
+        if against:
+            against.player = PLAYER2
+        else:
             self_play = True
-            against = QLearnTrain(PLAYER2)
+            against = QLearnTrain()
 
+        self._iterate(against, current_player, iterations, self_play)
+        if not self_play:
+            self.player = PLAYER2
+            against.player = PLAYER1
+            self._iterate(against, current_player, iterations, self_play)
+
+        if self_play:
+            self._states_value.update(against._states_value)
+            self.win_loose.append(against.win_loose)
+        self._save_learn_dict(name)
+
+    def _iterate(self, against, current_player, iterations, self_play):
         p1, p2, d = 0, 0, 0
-
         for i in range(iterations):
             if i % (iterations / 20) == 0:
                 print(f'iteration: {i}.')
-            if i % (iterations / 1000) == 0:
-                self._win_loose.append((p1, p2, d))
 
-            board = Board()
-            while not board.is_game_over():
-                if current_player == PLAYER1:
-                    if self.player == PLAYER1:
-                        column = self.move(board)
-                    else:
-                        column = against.move(board)
-                    current_player = PLAYER2
-                else:
-                    if self.player == PLAYER2:
-                        column = self.move(board)
-                    else:
-                        column = against.move(board)
-                    current_player = PLAYER1
-                board.add_token(column)
+            if i % (iterations / self.resolution) == 0:
+                self.win_loose.append((p1, p2, d))
 
-            winner = board.winner
-
-            self._feed_reward(winner)
-            self._reset()
+            winner = self._train(current_player, against)
             if self_play:
                 against._feed_reward(winner)
                 against._reset()
@@ -116,12 +114,28 @@ class QLearnTrain(QLearn):
                 p1 += 1
             elif winner == PLAYER2:
                 p2 += 1
-
         print(f'p1: {p1}, p2: {p2}, d: {d}')
 
-        self._save_learn_dict(name + ('_p1' if self_play else ''))
-        if self_play:
-            against._save_learn_dict(name + '_p2')
+    def _train(self, current_player, against):
+        board = Board()
+        while not board.is_game_over():
+            if current_player == PLAYER1:
+                if self.player == PLAYER1:
+                    column = self.move(board)
+                else:
+                    column = against.move(board)
+                current_player = PLAYER2
+            else:
+                if self.player == PLAYER2:
+                    column = self.move(board)
+                else:
+                    column = against.move(board)
+                current_player = PLAYER1
+            board.add_token(column)
+        winner = board.winner
+        self._feed_reward(winner)
+        self._reset()
+        return winner
 
     def _feed_reward(self, winner):
         if winner == self.player:
@@ -130,39 +144,43 @@ class QLearnTrain(QLearn):
             reward = -0.1
         else:
             reward = -1.0
-        for num_move, board, action in reversed(self.states):
+        for num_move, board, action in reversed(self._states):
             self._states_value[num_move][board][action] += self.learning_rate * (
-                    self.gamma_decay * reward - self._states_value[num_move][board][action])  # TODO rework
+                    self.gamma_decay * reward - self._states_value[num_move][board][action])
             reward = self._states_value[num_move][board][action]
 
     def _save_learn_dict(self, name):
+        if not os.path.exists('models'):
+            os.makedirs('models')
+        if not os.path.exists('models/learning'):
+            os.makedirs('models/learning')
         file_name = f'{name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
         print(f'save model as: {file_name}')
         with open(f'models/{file_name}.pkl', 'wb') as f:
             pickle.dump(self._states_value, f)
         with open(f'models/learning/{file_name}_learning_rate.pkl', 'wb') as f:
-            pickle.dump(self._win_loose, f)
+            pickle.dump(self.win_loose, f)
 
-    def _get_state_value(self, moves, board, action):
-        m = self._states_value.get(moves, None)
+    def _get_state_value(self, move_count, board, action):
+        m = self._states_value.get(move_count, None)
         if not m:
-            self._states_value[moves] = {}
-            m = self._states_value[moves]
+            self._states_value[move_count] = {}
+            m = self._states_value[move_count]
         b = m.get(board, None)
         if not b:
-            self._states_value[moves][board] = {}
-            b = self._states_value[moves][board]
+            self._states_value[move_count][board] = {}
+            b = self._states_value[move_count][board]
         c = b.get(action, None)
         if not c:
-            self._states_value[moves][board][action] = 0
+            self._states_value[move_count][board][action] = 0
             return 0
         else:
             return c
 
     def _reset(self):
-        self.states = []
+        self._states = []
         self._num_move = 0
 
     def reset(self):
         self._states_value = {}
-        self._win_loose = []
+        self.win_loose = []
