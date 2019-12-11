@@ -11,7 +11,7 @@ class BasicScore:
         return 0
 
 
-class AdvancedScore:
+class AdvancedScore(BasicScore):
     def __init__(self):
         self.point_dict = self.generate_points()
 
