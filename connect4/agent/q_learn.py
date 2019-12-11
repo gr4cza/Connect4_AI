@@ -83,7 +83,10 @@ class QLearnTrain(QLearn):
         if not self_play:
             self.player = PLAYER2
             against.player = PLAYER1
+            temp = self._states_value
+            self._states_value = {}
             self._iterate(against, current_player, iterations, self_play)
+            self._states_value = temp.update(self._states_value)
 
         if self_play:
             self._states_value.update(against._states_value)
