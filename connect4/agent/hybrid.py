@@ -23,3 +23,6 @@ class HybridAgent(object):
         if score == -math.inf:
             column = self.min_max.move(board)
         return column
+
+
+#TODO remove
