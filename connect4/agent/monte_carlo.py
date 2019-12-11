@@ -7,7 +7,7 @@ from random import choice
 
 import numpy as np
 
-from agent.random_agent import RandomAgent
+from connect4.agent.random_agent import RandomAgent
 from connect4.board import PLAYER1, PLAYER2, NO_ONE
 
 CR = math.sqrt(2)
