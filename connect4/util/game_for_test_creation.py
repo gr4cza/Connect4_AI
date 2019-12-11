@@ -1,4 +1,4 @@
-from board import Board
+from connect4.board import Board
 
 
 def play_game():

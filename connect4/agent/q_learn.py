@@ -4,7 +4,7 @@ import pickle
 import random
 from datetime import datetime
 
-from board import Board, PLAYER2, PLAYER1, NO_ONE
+from connect4.board import Board, PLAYER2, PLAYER1, NO_ONE
 
 random.seed(42)
 

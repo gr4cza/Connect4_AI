@@ -2,7 +2,7 @@ import math
 
 from agent.min_max import MinMaxAgentWAlphaBeta
 from agent.q_learn import QLearn
-from board import NO_ONE
+from connect4.board import NO_ONE
 
 MAX_PLAYER = 1
 MIN_PLAYER = -1

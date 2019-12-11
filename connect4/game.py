@@ -1,8 +1,8 @@
-from agent.min_max import MinMaxAgentWAlphaBeta
-from agent.monte_carlo import MonteCarlo
-from agent.player import Player
-from board import Board, PLAYER1, PLAYER2
-from evaluator import AdvancedScore
+from connect4.agent.min_max import MinMaxAgentWAlphaBeta
+from connect4.agent.monte_carlo import MonteCarlo
+from connect4.agent.player import Player
+from connect4.board import Board, PLAYER1, PLAYER2
+from connect4.evaluator import AdvancedScore
 
 
 def play_game():

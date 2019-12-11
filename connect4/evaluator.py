@@ -2,7 +2,7 @@ from itertools import product
 
 from numpy import count_nonzero
 
-from board import NO_ONE, PLAYER1, PLAYER2, R, C
+from connect4.board import NO_ONE, PLAYER1, PLAYER2, R, C
 
 
 class BasicScore:

@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 
-from board import NO_ONE
+from connect4.board import NO_ONE
 
 MAX_PLAYER = 1
 MIN_PLAYER = -1

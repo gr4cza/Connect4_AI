@@ -3,9 +3,8 @@ import sys
 
 import pygame
 
-from agent.monte_carlo import MonteCarlo
-from agent.random_agent import RandomAgent
-from board import Board, PLAYER1, PLAYER2, NO_ONE
+from connect4.agent.monte_carlo import MonteCarlo
+from connect4.board import Board, PLAYER1, PLAYER2, NO_ONE
 
 SPACING = 2
 

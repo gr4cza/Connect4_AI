@@ -1,9 +1,7 @@
 import unittest
 from copy import deepcopy
 
-import numpy as np
-
-from board import Board, NO_ONE, PLAYER1, PLAYER2
+from connect4.board import Board, NO_ONE, PLAYER1, PLAYER2
 
 
 class MyTestCase(unittest.TestCase):
