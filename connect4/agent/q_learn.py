@@ -2,6 +2,7 @@ import math
 import os
 import pickle
 import random
+from copy import deepcopy
 from datetime import datetime
 from time import time
 
@@ -84,10 +85,11 @@ class QLearnTrain(QLearn):
         if not self_play:
             self.player = PLAYER2
             against.player = PLAYER1
-            temp = self._states_value
+            temp = deepcopy(self._states_value)
             self._states_value = {}
             self._iterate(against, current_player, iterations, self_play)
-            self._states_value = temp.update(self._states_value)
+            temp.update(self._states_value)
+            self._states_value = temp
 
         if self_play:
             self._states_value.update(against._states_value)
