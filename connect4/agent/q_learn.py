@@ -3,6 +3,7 @@ import os
 import pickle
 import random
 from datetime import datetime
+from time import time
 
 from connect4.board import Board, PLAYER2, PLAYER1, NO_ONE
 
@@ -100,7 +101,7 @@ class QLearnTrain(QLearn):
                 print(f'iteration: {i}.')
 
             if i % (iterations / self.resolution) == 0:
-                self.win_loose.append((p1, p2, d))
+                self.win_loose.append((p1, p2, d, time()))
 
             winner = self._train(current_player, against)
             if self_play:
