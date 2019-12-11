@@ -6,8 +6,6 @@ from datetime import datetime
 
 from connect4.board import Board, PLAYER2, PLAYER1, NO_ONE
 
-random.seed(42)
-
 
 class QLearn(object):
     def __init__(self, source_name=None):
@@ -76,11 +74,10 @@ class QLearnTrain(QLearn):
     def learn(self, iterations=100, against=None, name=''):
         current_player = PLAYER1
         self_play = False
-        if against:
-            against.player = PLAYER2
-        else:
+        if not against:
             self_play = True
             against = QLearnTrain()
+        against.player = PLAYER2
 
         self._iterate(against, current_player, iterations, self_play)
         if not self_play:
