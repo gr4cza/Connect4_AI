@@ -60,7 +60,7 @@ class MinMaxAgent(object):
             else:
                 score = -100
         else:
-            score = self.score_function(board.board, self.player)
+            score = self.score_function(board.np_board, self.player)
         return score, None
 
 

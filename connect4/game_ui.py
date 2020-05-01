@@ -55,7 +55,7 @@ class GameUI(object):
 
     def __draw_board(self, board):
         radius = int(TOKEN_SIZE / 2)
-        b = board.board
+        b = board.np_board
         row, column = b.shape
         pygame.draw.rect(self.screen, BLUE, (0, HEIGHT - row * TOKEN_SIZE, WIDTH, row * TOKEN_SIZE))
 
