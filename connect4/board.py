@@ -93,7 +93,7 @@ class Board:
         self.bit_board_row_counter[column] += 1
         return row, bit_row
 
-    def check_winner(self):
+    def check_winner(self) -> int:
         bit_board = self.bit_board_1 if self.current_player == PLAYER1 else self.bit_board_2
 
         # check row
