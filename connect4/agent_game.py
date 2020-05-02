@@ -1,6 +1,7 @@
 from time import time
 
 from agent.min_max import MinMaxAgentWAlphaBeta
+from agent.q_learn import QLearn
 from connect4.agent.monte_carlo import MonteCarlo
 from connect4.agent.q_learn import QLearnTrain
 from connect4.agent.random_agent import RandomAgent
@@ -10,17 +11,17 @@ from connect4.evaluator import BasicScore, AdvancedScore
 
 def play_game(player1, player2):
     board = Board()
-    player = PLAYER1
+    current_player = PLAYER1
 
     while not board.is_game_over():
-        if player == PLAYER1:
+        if current_player == PLAYER1:
             col = player1.move(board)
             board.add_token(col)
-            player = PLAYER2
-        elif player == PLAYER2:
+            current_player = PLAYER2
+        elif current_player == PLAYER2:
             col = player2.move(board)
             board.add_token(col)
-            player = PLAYER1
+            current_player = PLAYER1
         print('.', end='')
     print()
     print(board)
@@ -45,10 +46,10 @@ def play_n_game(n, player1, player2):
 
 if __name__ == '__main__':
     adv_score = AdvancedScore()
-    basic_score = BasicScore()
-    train = QLearnTrain()
-    train.learn(10, against=MonteCarlo(1000))
-    # q_agent = QLearn(PLAYER1, source_name='models/min_max_5_10K_p1_20191111_202358.pkl')
+    # basic_score = BasicScore()
+    # train = QLearnTrain()
+    # train.learn(10, against=MonteCarlo(1000))
+    # q_agent = QLearn( source_name='models/min_max_5_10K_p1_20191111_202358.pkl')
 
     # # random game
     # play_n_game(10_000, RandomAgent(), RandomAgent())
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     # play_n_game(1,  MinMaxAgentWAlphaBeta(8, adv_score.score), RandomAgent)
     # print(time() - start_time)
     start_time = time()
-    play_n_game(1,  MonteCarlo(1000), RandomAgent)
+    play_n_game(100,  MonteCarlo(1000), RandomAgent)
     print(time() - start_time)
     # # min-max adv second vs random
     # play_n_game(100, RandomAgent(), MinMaxAgentWAlphaBeta(3, adv_score.score, PLAYER2))
