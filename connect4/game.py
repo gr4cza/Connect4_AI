@@ -1,51 +1,52 @@
-from connect4.agent.min_max import MinMaxAgentWAlphaBeta
-from connect4.agent.monte_carlo import MonteCarlo
-from connect4.agent.player import Player
-from connect4.board import Board, PLAYER1, PLAYER2
-from connect4.evaluator import AdvancedScore
+from agent.agent_factory import AgentFactory
+from board import Board, PLAYER1, PLAYER2, NO_ONE
 
 
 def play_game():
     board = Board()
-    score = AdvancedScore()
-    player = PLAYER1
+    current_player = PLAYER1
+    factory = AgentFactory()
 
-    p = Player()
-    p2 = Player()
-
-    ai_1 = MinMaxAgentWAlphaBeta(6, score.score)
-    ai_2 = MonteCarlo(10_000)
-
-    p2 = ai_2
-
-    p.choose_token()
-    p2.player = PLAYER2 if p.player == PLAYER1 else PLAYER1
+    human_player_token = choose_token()
+    if human_player_token == PLAYER1:
+        p1 = factory.get_agent_1('Player')
+        p2 = factory.get_agent_2('MonteCarlo')
+    else:
+        p1 = factory.get_agent_1('MonteCarlo')
+        p2 = factory.get_agent_2('Player')
 
     while not board.is_game_over():
-        if player == PLAYER1:
-            choose(board, player, p, p2)
-            player = PLAYER2
-        elif player == PLAYER2:
-            choose(board, player, p, p2)
-            player = PLAYER1
+        if current_player == PLAYER1:
+            choose(board, p1)
+            current_player = PLAYER2
+        elif current_player == PLAYER2:
+            choose(board, p2)
+            current_player = PLAYER1
 
     print('-' * 30)
     print(board)
-    print(board.moves)
-    if board.winner != 0:
+
+    if board.winner != NO_ONE:
         print(f'{"O" if board.winner == PLAYER1 else "X"} wins!')
     else:
         print('Draw!')
 
 
-def choose(board, player, p1, p2):
-    if player == p1.player:
-        col = p1.move(board)
-        board.add_token(col)
-    else:
-        col = p2.move(board)
-        print(f'The machine choose: {col + 1}')
-        board.add_token(col)
+def choose(board, player):
+    col = player.move(board)
+    board.add_token(col)
+
+
+def choose_token():
+    while True:
+        play_as = input('Choose token! ("O"/"X")? Note: "O" starts \n')
+        if play_as.lower() in ["o", "x"]:
+            if play_as.lower() == "o":
+                return PLAYER1
+            elif play_as.lower() == "x":
+                return PLAYER2
+        else:
+            print("Not a valid choice!")
 
 
 if __name__ == '__main__':
@@ -53,8 +54,8 @@ if __name__ == '__main__':
     while play_again:
         play_game()
         while True:
-            again = input("Do you wanna play again? (Y/N)\n")
-            if again.lower() in ["y", "n"]:
-                if again.lower() == "n":
+            again = input('Do you wanna play again? (Y/N)\n')
+            if again.lower() in ['y', 'n']:
+                if again.lower() == 'n':
                     play_again = False
                 break

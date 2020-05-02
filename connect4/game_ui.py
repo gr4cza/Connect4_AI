@@ -86,8 +86,6 @@ class GameUI(object):
 
 
 class PlayerUI(object):
-    def __init__(self) -> None:
-        self.player = NO_ONE
 
     @staticmethod
     def move(board):
@@ -117,5 +115,5 @@ class PlayerUI(object):
 
 
 if __name__ == '__main__':
-    game = GameUI(PlayerUI, MonteCarlo(2000))
+    game = GameUI(PlayerUI, MonteCarlo(PLAYER2, 2000))
     game.game_loop()

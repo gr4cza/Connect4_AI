@@ -10,8 +10,8 @@ from connect4.board import Board, PLAYER2, PLAYER1, NO_ONE
 
 
 class QLearn(object):
-    def __init__(self, source_name=None):
-        self.player = NO_ONE
+    def __init__(self, player, source_name=None):
+        self.player = player
         self._states_value = self._load_learn_dict(source_name)
 
     def move(self, board):

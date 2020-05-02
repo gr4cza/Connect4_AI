@@ -8,10 +8,10 @@ from random import choice
 import numpy as np
 
 from connect4.agent.random_agent import RandomAgent
-from connect4.board import PLAYER1, PLAYER2, NO_ONE
+from connect4.board import PLAYER1, PLAYER2
 
 CR = math.sqrt(2)
-random_a = RandomAgent()
+random_agent = RandomAgent()
 
 
 class Node(object):
@@ -43,7 +43,7 @@ class Node(object):
     def simulate(self):
         board = deepcopy(self.board)
         while not board.is_game_over():
-            col = random_a.move(board)
+            col = random_agent.move(board)
             board.add_token(col)
         return board.winner
 
@@ -58,9 +58,9 @@ class Node(object):
 
 
 class MonteCarlo(object):
-    def __init__(self, turns) -> None:
+    def __init__(self, player, turns) -> None:
         self.turns = turns
-        self.player = NO_ONE
+        self.player = player
 
     def move(self, board):
         return self._monte_carlo(board)

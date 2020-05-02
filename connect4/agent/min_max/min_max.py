@@ -8,8 +8,8 @@ MIN_PLAYER = -1
 
 
 class MinMaxAgent(object):
-    def __init__(self, depth, score_function):
-        self.player = NO_ONE
+    def __init__(self, player, depth, score_function):
+        self.player = player
         self.depth = depth
         self.score_function = score_function
         self.time_penalty = 0.99
