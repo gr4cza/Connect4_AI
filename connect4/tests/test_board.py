@@ -61,7 +61,7 @@ class MyTestCase(unittest.TestCase):
                                            '[ , O,  ,  ,  ,  ,  ]\n'))
         self.assertEqual(self.board.available_moves(), [0, 2, 3, 4, 5, 6])
 
-    def test_full_table_available_moves(self):
+    def test_full_table_available_moves_and_draw(self):
         for i in [3, 3, 3, 4, 1, 0, 0, 3, 2, 0, 6, 1, 4, 2, 1, 4, 4, 1, 0, 5, 5, 3, 2, 0, 3, 2, 1,
                   4, 2, 5, 4, 0, 5, 5, 1, 6, 5, 2, 6, 6, 6, 6]:
             self.board.add_token(i)
@@ -72,6 +72,7 @@ class MyTestCase(unittest.TestCase):
                                            '[O, X, X, X, O, O, X]\n'
                                            '[X, O, O, O, X, X, O]\n'))
         self.assertEqual(self.board.available_moves(), [])
+        self.assertEqual(self.board.winner, NO_ONE)
 
     def test_after_win_available_moves(self):
         for i in [2, 1, 2, 1, 2, 1, 2]:
@@ -187,18 +188,6 @@ class MyTestCase(unittest.TestCase):
                                            '[ , O, X, X, X,  ,  ]\n'
                                            '[ , X, X, O, O,  , O]\n'))
         self.assertEqual(self.board.winner, PLAYER1)
-
-    def test_draw(self):
-        for i in [3, 3, 3, 4, 1, 0, 0, 3, 2, 0, 6, 1, 4, 2, 1, 4, 4, 1, 0, 5, 5, 3, 2, 0, 3, 2, 1,
-                  4, 2, 5, 4, 0, 5, 5, 1, 6, 5, 2, 6, 6, 6, 6]:
-            self.board.add_token(i)
-        self.assertEqual(str(self.board), ('[X, O, X, O, O, O, X]\n'
-                                           '[X, O, O, X, X, X, O]\n'
-                                           '[O, X, X, X, O, O, X]\n'
-                                           '[X, O, O, O, X, X, O]\n'
-                                           '[O, X, X, X, O, O, X]\n'
-                                           '[X, O, O, O, X, X, O]\n'))
-        self.assertEqual(self.board.winner, NO_ONE)
 
     def test_board_hash(self):
         for i in [3, 2, 4, 1, 1, 2, 2, 3, 3]:

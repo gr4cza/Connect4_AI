@@ -107,8 +107,8 @@ class QLearnTrain(QLearn):
 
             winner = self._train(current_player, against)
             if self_play:
-                against._feed_reward(winner)
-                against._reset()
+                against.__feed_reward(winner)
+                against.__reset()
             current_player = PLAYER1
 
             if winner == 0:
@@ -136,11 +136,11 @@ class QLearnTrain(QLearn):
                 current_player = PLAYER1
             board.add_token(column)
         winner = board.winner
-        self._feed_reward(winner)
-        self._reset()
+        self.__feed_reward(winner)
+        self.__reset()
         return winner
 
-    def _feed_reward(self, winner):
+    def __feed_reward(self, winner):
         if winner == self.player:
             reward = 1.0
         elif winner == NO_ONE:
@@ -180,7 +180,7 @@ class QLearnTrain(QLearn):
         else:
             return c
 
-    def _reset(self):
+    def __reset(self):
         self._states = []
         self._num_move = 0
 

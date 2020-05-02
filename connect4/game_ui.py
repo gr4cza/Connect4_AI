@@ -100,9 +100,9 @@ class PlayerUI(object):
 
                 if event.type == pygame.MOUSEMOTION:
                     pygame.draw.rect(screen, BACKGROUND, (0, 0, WIDTH, TOKEN_SIZE))
-                    posx = event.pos[0]
+                    pos_x = event.pos[0]
                     color = YELLOW if board.current_player == PLAYER1 else RED
-                    pygame.draw.circle(screen, color, (posx, int(TOKEN_SIZE / 2)), int(TOKEN_SIZE / 2) - 2)
+                    pygame.draw.circle(screen, color, (pos_x, int(TOKEN_SIZE / 2)), int(TOKEN_SIZE / 2) - 2)
                     pygame.display.update()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:

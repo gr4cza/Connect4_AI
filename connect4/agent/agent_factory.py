@@ -1,5 +1,3 @@
-from enum import Enum
-
 from agent.min_max.evaluator import AdvancedScore
 from agent.min_max.min_max import MinMaxAgentWAlphaBeta, MinMaxAgent
 from agent.monte_carlo import MonteCarlo
