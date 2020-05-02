@@ -41,7 +41,7 @@ class Board:
 
             self.move_count += 1
 
-            self.check_winner()
+            self.winner = self.check_winner()
             self.current_player = PLAYER1 if player != PLAYER1 else PLAYER2
             return True
         return False
@@ -99,22 +99,24 @@ class Board:
         # check row
         m = bit_board & (bit_board >> 7)
         if m & (m >> 14):
-            self.winner = self.current_player
+            return self.current_player
 
         # check column
         m = bit_board & (bit_board >> 1)
         if m & (m >> 2):
-            self.winner = self.current_player
+            return self.current_player
 
         # check negative diagonal
         m = bit_board & (bit_board >> 6)
         if m & (m >> 12):
-            self.winner = self.current_player
+            return self.current_player
 
         # check positive diagonal
         m = bit_board & (bit_board >> 8)
         if m & (m >> 16):
-            self.winner = self.current_player
+            return self.current_player
+
+        return NO_ONE
 
     # for debug
     def get_hash(self):
