@@ -1,3 +1,4 @@
+from agent.alpha_z import AlphaZero
 from agent.min_max.evaluator import AdvancedScore
 from agent.min_max.min_max import MinMaxAgentWAlphaBeta, MinMaxAgent
 from agent.monte_carlo import MonteCarlo
@@ -29,3 +30,5 @@ class AgentFactory:
             return MinMaxAgentWAlphaBeta(player, 6, AdvancedScore.score)
         if agent_type == 'MonteCarlo':
             return MonteCarlo(player, 2000)
+        if agent_type == 'AlphaZero':
+            return AlphaZero()
