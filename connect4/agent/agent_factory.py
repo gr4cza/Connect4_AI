@@ -31,4 +31,4 @@ class AgentFactory:
         if agent_type == 'MonteCarlo':
             return MonteCarlo(player, 2000)
         if agent_type == 'AlphaZero':
-            return AlphaZero()
+            return AlphaZero(player)

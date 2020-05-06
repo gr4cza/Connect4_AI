@@ -5,9 +5,10 @@ from board import Board
 
 class AlphaZero:
 
-    def __init__(self):
+    def __init__(self, player):
+        self.player = player
         self.alpha_net = AlphaNet()
-        self.mcts = MCTS(self.alpha_net)
+        self.mcts = MCTS(self.alpha_net, player)
 
     def move(self, board):
         mv = self._predict(board)
