@@ -2,14 +2,12 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Flatten, Input, Add
 from tensorflow.keras.models import Model
 
-# Turn off memory consumption
-REG_FACTOR = 0.001
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpu_devices[0], True)
-
+REG_FACTOR = 0.0001
 KERNEL_SIZE = (3, 3)
-
 FILTERS = 128
+CONV_LAYER_COUNT = 20
+
+tf.debugging.set_log_device_placement(True)
 
 
 class AlphaNet:
@@ -21,7 +19,7 @@ class AlphaNet:
         inp = Input(shape=(6, 7, 3), name='input')
 
         x = ConvLayer()(inp)
-        for _ in range(20):
+        for _ in range(CONV_LAYER_COUNT):
             x = ResLayer()(x)
 
         policy_out = PolicyLayer(name='policy_out')(x)
@@ -29,7 +27,7 @@ class AlphaNet:
 
         model = Model(inp, outputs=[policy_out, value_out])
         model.compile(optimizer='adam',
-                      loss={'policy_layer': 'mean_squared_error', 'value_layer': 'binary_crossentropy'},
+                      loss={'policy_out': 'mean_squared_error', 'value_out': 'binary_crossentropy'},
                       # TODO own loss function
                       loss_weights=[0.5, 0.5])
         return model
@@ -74,8 +72,8 @@ class ResLayer(Layer):
 
 
 class PolicyLayer(Layer):
-    def __init__(self, name=None, *args, **kwargs):
-        super().__init__(name, *args, **kwargs)
+    def __init__(self, trainable=True, name=None, dtype=None, dynamic=False, **kwargs):
+        super().__init__(trainable, name, dtype, dynamic, **kwargs)
         self.conv2d = Conv2D(2, (1, 1), kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm = BatchNormalization()
         self.dense = Dense(7, kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
@@ -92,14 +90,14 @@ class PolicyLayer(Layer):
 
 
 class ValueLayer(Layer):
-    def __init__(self, name=None, *args, **kwargs):
-        super().__init__(name, *args, **kwargs)
+    def __init__(self, trainable=True, name=None, dtype=None, dynamic=False, **kwargs):
+        super().__init__(trainable, name, dtype, dynamic, **kwargs)
         self.conv2d = Conv2D(1, (1, 1), kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm = BatchNormalization()
 
         self.flatten = Flatten()
         self.dense_1 = Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
-        self.dense_2 = Dense(1, activation='tanh', kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
+        self.dense_2 = Dense(1, activation='tanh')
 
     def call(self, inputs, **kwargs):
         x = self.conv2d(inputs)
