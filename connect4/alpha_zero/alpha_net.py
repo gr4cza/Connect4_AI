@@ -3,6 +3,7 @@ from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Fl
 from tensorflow.keras.models import Model
 
 # Turn off memory consumption
+REG_FACTOR = 0.001
 gpu_devices = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
@@ -29,6 +30,7 @@ class AlphaNet:
         model = Model(inp, outputs=[policy_out, value_out])
         model.compile(optimizer='adam',
                       loss={'policy_layer': 'mean_squared_error', 'value_layer': 'binary_crossentropy'},
+                      # TODO own loss function
                       loss_weights=[0.5, 0.5])
         return model
 
@@ -36,7 +38,8 @@ class AlphaNet:
 class ConvLayer(Layer):
     def __init__(self):
         super().__init__()
-        self.conv2d = Conv2D(FILTERS, KERNEL_SIZE, padding='same')
+        self.conv2d = Conv2D(FILTERS, KERNEL_SIZE, padding='same',
+                             kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm = BatchNormalization()
 
     def call(self, inputs, **kwargs):
@@ -48,10 +51,12 @@ class ConvLayer(Layer):
 class ResLayer(Layer):
     def __init__(self):
         super().__init__()
-        self.conv2d_1 = Conv2D(FILTERS, KERNEL_SIZE, padding='same')
+        self.conv2d_1 = Conv2D(FILTERS, KERNEL_SIZE, padding='same',
+                               kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm_1 = BatchNormalization()
 
-        self.conv2d_2 = Conv2D(FILTERS, KERNEL_SIZE, padding='same')
+        self.conv2d_2 = Conv2D(FILTERS, KERNEL_SIZE, padding='same',
+                               kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm_2 = BatchNormalization()
         self.add = Add()
 
@@ -71,9 +76,9 @@ class ResLayer(Layer):
 class PolicyLayer(Layer):
     def __init__(self, name=None, *args, **kwargs):
         super().__init__(name, *args, **kwargs)
-        self.conv2d = Conv2D(2, (1, 1))
+        self.conv2d = Conv2D(2, (1, 1), kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm = BatchNormalization()
-        self.dense = Dense(7)
+        self.dense = Dense(7, kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.flatten = Flatten()
 
     def call(self, inputs, **kwargs):
@@ -89,12 +94,12 @@ class PolicyLayer(Layer):
 class ValueLayer(Layer):
     def __init__(self, name=None, *args, **kwargs):
         super().__init__(name, *args, **kwargs)
-        self.conv2d = Conv2D(1, (1, 1))
+        self.conv2d = Conv2D(1, (1, 1), kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
         self.batch_norm = BatchNormalization()
 
         self.flatten = Flatten()
-        self.dense_1 = Dense(64, activation='relu')
-        self.dense_2 = Dense(1, activation='tanh')
+        self.dense_1 = Dense(64, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
+        self.dense_2 = Dense(1, activation='tanh', kernel_regularizer=tf.keras.regularizers.l2(REG_FACTOR))
 
     def call(self, inputs, **kwargs):
         x = self.conv2d(inputs)
