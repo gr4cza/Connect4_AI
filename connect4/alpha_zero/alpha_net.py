@@ -7,8 +7,6 @@ KERNEL_SIZE = (3, 3)
 FILTERS = 128
 CONV_LAYER_COUNT = 20
 
-tf.debugging.set_log_device_placement(True)
-
 
 class AlphaNet:
     def __init__(self):
@@ -27,8 +25,8 @@ class AlphaNet:
 
         model = Model(inp, outputs=[policy_out, value_out])
         model.compile(optimizer='adam',
-                      loss={'policy_out': 'mean_squared_error', 'value_out': 'binary_crossentropy'},
-                      # TODO own loss function
+                      loss={'policy_out': 'mean_squared_error', 'value_out': 'categorical_crossentropy'},
+                      # TODO own loss function ?
                       loss_weights=[0.5, 0.5])
         return model
 

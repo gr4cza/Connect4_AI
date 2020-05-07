@@ -10,7 +10,7 @@ C_PUCT = 1
 
 class MCTS:
 
-    def __init__(self, net, player, turns=300) -> None:  # TODO megemelni a számott
+    def __init__(self, net, player, turns=100) -> None:  # TODO megemelni a számott
         self.net = net
         self.player = player
         self.turns = turns
@@ -22,15 +22,19 @@ class MCTS:
         for _ in range(self.turns):
             # select best node
             node = self._search_best_leaf(root)
-            v = float(0)
-            if not node.board.is_game_over():
-                # expand
-                node = node.expand()
-                v = node.compute(self.net)
+
+            # if game over in leaf
+            if node.board.is_game_over():
+                node.back_propagate(node.v)
+                continue
+
+            # expand
+            node = node.expand()
+            v = node.compute(self.net)
+
             # back_propagate
-            else:
-                v = node.v
             node.back_propagate(v)
+
         return self._bets_action(root)
 
     def _search_best_leaf(self, node):
@@ -52,9 +56,9 @@ class Node:
         self.parent = parent
         self.children = {}
         self.N = 0
-        self.W = 0
-        self.P = {}  # TODO
-        self.v = float(0)
+        self.W = 0.0
+        self.P = {}
+        self.v = 0.0
 
         self._create_children_nodes()
 
@@ -76,18 +80,17 @@ class Node:
 
     def back_propagate(self, v):
         self.N += 1
-        self.W += v  # TODO check
+        v1 = -v if self.board.current_player == PLAYER1 else v
+        self.W += v1
         if self.parent:
-            self.parent.back_propagate(-v)
+            self.parent.back_propagate(v)
 
     def compute(self, net):
         [p], [[v]] = net.model.predict(encode_board(self.board))
         self.v = v
-        for ind, value in enumerate(p):
-            self.P[ind] = value
+        for idx, value in enumerate(p):
+            self.P[idx] = value
         return self.v
 
     def __str__(self) -> str:
         return str(self.PUCT())
-
-
