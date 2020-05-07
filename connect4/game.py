@@ -1,6 +1,8 @@
 from agent.agent_factory import AgentFactory
 from board import Board, PLAYER1, PLAYER2, NO_ONE
 
+ENEMY = 'AlphaZero'
+
 
 def play_game():
     board = Board()
@@ -10,9 +12,9 @@ def play_game():
     human_player_token = choose_token()
     if human_player_token == PLAYER1:
         p1 = factory.get_agent_1('Player')
-        p2 = factory.get_agent_2('MonteCarlo')
+        p2 = factory.get_agent_2(ENEMY)
     else:
-        p1 = factory.get_agent_1('MonteCarlo')
+        p1 = factory.get_agent_1(ENEMY)
         p2 = factory.get_agent_2('Player')
 
     while not board.is_game_over():
