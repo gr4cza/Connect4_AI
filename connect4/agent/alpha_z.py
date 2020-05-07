@@ -5,23 +5,12 @@ from board import Board
 
 class AlphaZero:
 
-    def __init__(self, player):
-        self.player = player
-        self.alpha_net = AlphaNet()
+    def __init__(self, player, net=None):
+        self.alpha_net = AlphaNet() if not net else net
         self.mcts = MCTS(self.alpha_net, player)
 
     def move(self, board):
-        mv = self._predict(board)
-        return mv
+        return self.mcts.next_move(board)
 
     def train(self):
         pass
-
-    def _predict(self, board):
-        return self.mcts.next_move(board)
-
-
-if __name__ == '__main__':
-    a = AlphaZero()
-    b = Board()
-    print(a._encode_board(b))
