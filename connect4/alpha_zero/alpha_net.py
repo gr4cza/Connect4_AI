@@ -40,7 +40,7 @@ class ConvLayer(Layer):
 
     def call(self, inputs, **kwargs):
         x = self.conv2d(inputs)
-        x = self.batch_norm(x)
+        x = self.batch_norm(x, training=kwargs.get('training'))
         return tf.nn.relu(x)
 
 
@@ -58,11 +58,11 @@ class ResLayer(Layer):
 
     def call(self, inputs, **kwargs):
         x = self.conv2d_1(inputs)
-        x = self.batch_norm_1(x)
+        x = self.batch_norm_1(x, training=kwargs.get('training'))
         x = tf.nn.relu(x)
 
         x = self.conv2d_2(x)
-        x = self.batch_norm_2(x)
+        x = self.batch_norm_2(x, training=kwargs.get('training'))
 
         x = self.add([x, inputs])
 
@@ -79,7 +79,7 @@ class PolicyLayer(Layer):
 
     def call(self, inputs, **kwargs):
         x = self.conv2d(inputs)
-        x = self.batch_norm(x)
+        x = self.batch_norm(x, training=kwargs.get('training'))
         x = tf.nn.relu(x)
 
         x = self.flatten(x)
@@ -99,7 +99,7 @@ class ValueLayer(Layer):
 
     def call(self, inputs, **kwargs):
         x = self.conv2d(inputs)
-        x = self.batch_norm(x)
+        x = self.batch_norm(x, training=kwargs.get('training'))
         x = tf.nn.relu(x)
 
         x = self.flatten(x)
