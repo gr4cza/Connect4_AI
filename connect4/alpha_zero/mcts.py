@@ -66,7 +66,7 @@ class Node:
         for move in self.board.available_moves():
             self.children[move] = None
 
-    def PUCT(self):
+    def PUCT(self):  # noqa
         return (self.W / (1 + self.N)) + C_PUCT * self.parent.P[self.action] * \
                (sqrt(self.parent.N) / (1 + self.N))
 

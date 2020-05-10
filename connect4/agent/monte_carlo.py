@@ -29,7 +29,7 @@ class Node(object):
         for move in self.board.available_moves():
             self.children[move] = None
 
-    def UTC(self):
+    def UTC(self): # noqa
         utc = self.wins / self.plays + CR * sqrt(np.log(self.parent.plays) / self.plays)
         return utc
 
