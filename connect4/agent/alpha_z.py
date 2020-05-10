@@ -1,6 +1,5 @@
 from alpha_zero.alpha_net import AlphaNet
 from alpha_zero.mcts import MCTS
-from board import Board
 
 
 class AlphaZero:
