@@ -86,7 +86,7 @@ class Node:
             self.parent.back_propagate(v)
 
     def compute(self, net):
-        [p], [[v]] = net.model.predict(encode_board(self.board))
+        [p], [[v]] = net.model.predict_on_batch(encode_board(self.board))
         self.v = v
         for idx, value in enumerate(p):
             self.P[idx] = value
