@@ -14,7 +14,7 @@ CR = math.sqrt(2)
 random_agent = RandomAgent()
 
 
-class Node(object):
+class Node:
     def __init__(self, board, player, parent=None):
         self.board = board
         self.player = player
