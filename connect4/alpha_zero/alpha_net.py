@@ -25,7 +25,8 @@ class AlphaNet:
 
         model = Model(inp, outputs=[policy_out, value_out])
         model.compile(optimizer='adam',
-                      loss={'policy_out': 'mean_squared_error', 'value_out': 'categorical_crossentropy'},
+                      loss={'policy_out': tf.keras.losses.CategoricalCrossentropy(),
+                            'value_out': 'mean_squared_error'},
                       # TODO own loss function ?
                       loss_weights=[0.5, 0.5])
         return model

@@ -14,4 +14,4 @@ def encode_board(board):
                 encoded[row, col, 1] = 1
     if board.current_player == PLAYER2:
         encoded[:, :, 2] = 1
-    return encoded.reshape((1, 6, 7, 3))
+    return encoded

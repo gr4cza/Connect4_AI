@@ -1,23 +1,24 @@
 from copy import deepcopy
 from math import sqrt
 from random import choice
-
+from board import C
 from alpha_zero.util import encode_board
 from board import PLAYER1, PLAYER2
+import numpy as np
 
 C_PUCT = 1
 
 
-class MCTS:
+class MCTS:  # noqa
 
     def __init__(self, net, player, turns=100) -> None:  # TODO megemelni a számott
         self.net = net
         self.player = player
         self.turns = turns
 
-    def next_move(self, board):
+    def next_move(self, board, train):
         root = Node(board, self.player)
-        root.compute(self.net)
+        e_board = root.compute(self.net, train)
 
         for _ in range(self.turns):
             # select best node
@@ -35,7 +36,10 @@ class MCTS:
             # back_propagate
             node.back_propagate(v)
 
-        return self._bets_action(root)
+        if train:
+            return self._bets_action(root), (e_board, self._policy(root))
+        else:
+            return self._bets_action(root)
 
     def _search_best_leaf(self, node):
         if None in node.children.values() or len(node.children) == 0:
@@ -46,6 +50,16 @@ class MCTS:
     def _bets_action(node):
         key, _ = max(node.children.items(), key=lambda x: x[1].N)
         return key
+
+    @staticmethod
+    def _policy(root):
+        p = []
+        children = root.children
+
+        for i in range(C):
+            p.append(children.get(i, DummyNode))
+
+        return np.fromiter(map(lambda x: x.N / root.N, p), dtype=np.float32)
 
 
 class Node:
@@ -85,12 +99,20 @@ class Node:
         if self.parent:
             self.parent.back_propagate(v)
 
-    def compute(self, net):
-        [p], [[v]] = net.model.predict_on_batch(encode_board(self.board))
+    def compute(self, net, train=False):
+        e_board = encode_board(self.board)
+        [p], [[v]] = net.model.predict_on_batch(np.expand_dims(e_board, axis=0))
         self.v = v
         for idx, value in enumerate(p):
             self.P[idx] = value
-        return self.v
+        if train:
+            return e_board
+        else:
+            return self.v
 
     def __str__(self) -> str:
         return str(self.PUCT())
+
+
+class DummyNode:
+    N = 0
