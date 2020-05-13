@@ -10,6 +10,3 @@ class AlphaZero:
 
     def move(self, board, train=False):
         return self.mcts.next_move(board, train)
-
-    def train(self):
-        pass
