@@ -31,6 +31,9 @@ class AlphaNet:
                       loss_weights=[0.5, 0.5])
         return model
 
+    def train(self, data, epochs):
+        self.model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
+
 
 class ConvLayer(Layer):
     def __init__(self):
