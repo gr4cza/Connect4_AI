@@ -26,12 +26,12 @@ class GameData:
             self.values.extend(game.values)
 
     def load_from_file(self, file_name):
-        with open('./training_data/data/{}.pkl'.format(file_name), 'rb')as file:
+        with open(f'./training_data/data/{file_name}.pkl', 'rb')as file:
             data = pickle.load(file)
         self.add_games([data])
 
     def save(self, file_name):
-        with open('./training_data/data/{}.pkl'.format(file_name), 'wb')as file:
+        with open(f'./training_data/data/{file_name}.pkl', 'wb')as file:
             pickle.dump(self, file)
 
     @property
@@ -47,7 +47,7 @@ class GameData:
         return np.array(self.values)
 
     def __str__(self) -> str:
-        return 'Game_Data: {} states'.format(len(self.boards))
+        return f'Game_Data: {len(self.boards)} states'
 
 
 if __name__ == '__main__':

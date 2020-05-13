@@ -1,4 +1,6 @@
 import tensorflow as tf
+import numpy as np
+
 from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Flatten, Input, Add
 from tensorflow.keras.models import Model
 
@@ -10,7 +12,7 @@ CONV_LAYER_COUNT = 20
 
 class AlphaNet:
     def __init__(self):
-        self.model = self._build_model()
+        self._model = self._build_model()
 
     @staticmethod
     def _build_model():
@@ -32,7 +34,16 @@ class AlphaNet:
         return model
 
     def train(self, data, epochs):
-        self.model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
+        self._model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
+
+    def predict(self, board):
+        return self._model.predict_on_batch(np.expand_dims(board, axis=0))
+
+    def load_model(self, file_name):
+        pass
+
+    def save_model(self, file_name):
+        pass
 
 
 class ConvLayer(Layer):
@@ -113,4 +124,4 @@ class ValueLayer(Layer):
 
 if __name__ == '__main__':
     a = AlphaNet()
-    print(a.model.summary())
+    print(a._model.summary())  # noqa

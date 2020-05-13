@@ -13,7 +13,7 @@ def self_play(net, n=10, mcts_turns=100):
     game_data = GameData()
 
     for i in range(n):
-        print('self play {} starting'.format(i + 1))
+        print(f'self play {i + 1} starting')
         board = Board()
         current_player = PLAYER1
 
@@ -33,7 +33,7 @@ def self_play(net, n=10, mcts_turns=100):
 
                 p2_data.add_play(p2_board, p2_policy)
                 current_player = PLAYER1
-        print(board)
+            print(board)
 
         winner = board.winner
 
@@ -60,17 +60,17 @@ def v_value(winner, player):
 def train(times):
     # variables
     best_net = AlphaNet()
-    data = GameData()
+    data = GameData('test_2')
 
     for i in range(times):
         # self play
-        data_run = self_play(net=best_net, n=10, mcts_turns=100)
+        data_run = self_play(net=best_net, n=10, mcts_turns=300)
 
         # add new data to database
         data.add_games([data_run])
 
         # save new database
-        data.save('test_{}'.format(i))
+        data.save(f'test_{i}')
 
         # retrain
         new_net = best_net.train(data, epochs=20)

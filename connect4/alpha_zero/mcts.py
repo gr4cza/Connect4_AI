@@ -105,7 +105,7 @@ class Node:
 
     def compute(self, net, root=False, train=False):
         e_board = encode_board(self.board)
-        [p], [[v]] = net.model.predict_on_batch(np.expand_dims(e_board, axis=0))
+        [p], [[v]] = net.predict(e_board)
         self.v = v
         if root:
             p = self._add_dirichlet_noise(p)
