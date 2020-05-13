@@ -62,15 +62,18 @@ def train(times):
     best_net = AlphaNet()
     data = GameData()
 
-    for _ in range(times):
+    for i in range(times):
         # self play
         data_run = self_play(net=best_net, n=10, mcts_turns=100)
 
         # add new data to database
         data.add_games([data_run])
 
+        # save new database
+        data.save('test_{}'.format(i))
+
         # retrain
-        new_net = best_net.train(data, epochs=50)
+        new_net = best_net.train(data, epochs=20)
 
         # evaluate
         best_net = evaluate(best_net, new_net)
