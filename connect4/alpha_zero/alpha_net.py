@@ -1,5 +1,20 @@
-import tensorflow as tf
+import os
+
 import numpy as np
+import tensorflow as tf
+
+# For avoid memmory leak
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
 
 from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Flatten, Input, Add
 from tensorflow.keras.models import Model
@@ -9,10 +24,18 @@ KERNEL_SIZE = (3, 3)
 FILTERS = 128
 CONV_LAYER_COUNT = 20
 
+DATA_PATH = f'{os.path.dirname(__file__)}/training_data/'
+
 
 class AlphaNet:
-    def __init__(self):
-        self._model = self._build_model()
+    def __init__(self, model_name):
+        model_path = self._get_model_path(model_name)
+
+        if self._check_model_exists(model_path):
+            self.load_model(model_name)
+        else:
+            self._model = self._build_model()
+            self.save_model(model_name)
 
     @staticmethod
     def _build_model():
@@ -33,17 +56,36 @@ class AlphaNet:
                       loss_weights=[0.5, 0.5])
         return model
 
-    def train(self, data, epochs):
+    def train(self, data, epochs, new_name):
         self._model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
+        self.save_model(new_name)
+        return new_name
 
     def predict(self, board):
         return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
 
     def load_model(self, file_name):
-        pass
+        file_path = self._get_model_path(file_name)
+        if self._check_model_exists(file_path):
+            self._model = tf.keras.models.load_model(file_path)
+        else:
+            print(f'Saved model "{file_name}" does not exists!')
 
     def save_model(self, file_name):
-        pass
+        file_path = self._get_model_path(file_name)
+        self._model.save(file_path)
+
+    @staticmethod
+    def _get_model_path(file_name):
+        return DATA_PATH + f'models/{file_name}/'
+
+    @staticmethod
+    def _check_model_exists(model_path):
+        return os.path.exists(model_path)
+
+    def release(self):
+        del self._model
+        tf.keras.backend.clear_session()
 
 
 class ConvLayer(Layer):
@@ -123,5 +165,5 @@ class ValueLayer(Layer):
 
 
 if __name__ == '__main__':
-    a = AlphaNet()
+    a = AlphaNet('test')
     print(a._model.summary())  # noqa

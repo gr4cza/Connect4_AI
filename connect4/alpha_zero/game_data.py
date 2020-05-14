@@ -1,3 +1,4 @@
+import os
 import pickle
 
 import numpy as np
@@ -26,12 +27,12 @@ class GameData:
             self.values.extend(game.values)
 
     def load_from_file(self, file_name):
-        with open(f'./training_data/data/{file_name}.pkl', 'rb')as file:
+        with open(f'{os.path.dirname(__file__)}/training_data/data/{file_name}.pkl', 'rb')as file:
             data = pickle.load(file)
         self.add_games([data])
 
     def save(self, file_name):
-        with open(f'./training_data/data/{file_name}.pkl', 'wb')as file:
+        with open(f'{os.path.dirname(__file__)}/training_data/data/{file_name}.pkl', 'wb')as file:
             pickle.dump(self, file)
 
     @property
