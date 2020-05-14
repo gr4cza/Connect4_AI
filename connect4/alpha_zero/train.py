@@ -33,8 +33,9 @@ def predict_process(net, channels):
 
         [policy, value] = alpha_net.predict(boards)
         policy, value = policy.numpy(), value.numpy()
-        for idx, c in enumerate(active_channels):
-            c.send([[policy[idx]], [value[idx]]])
+
+        for c, p, v in zip(active_channels, policy, value):
+            c.send([[p], [v]])
 
 
 def multi_self_play(net, n=10, mcts_turns=100):
