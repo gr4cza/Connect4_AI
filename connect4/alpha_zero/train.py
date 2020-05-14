@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import time
 
 import numpy as np
 
@@ -6,13 +7,13 @@ from agent.alpha_z import AlphaZero
 from alpha_zero.game_data import GameData
 from board import PLAYER1, PLAYER2, Board, NO_ONE
 
-THREAD_COUNT = 100
+THREAD_COUNT = 50
 
 
 def predict_process(net, channels):
     print(f'Predict process started with net {net}')
     active_channels = channels
-
+    n = len(active_channels)
     # Placed here, to not load in every process
     from alpha_zero.alpha_net import AlphaNet
 
@@ -20,7 +21,7 @@ def predict_process(net, channels):
 
     while len(active_channels):
         boards = []
-
+        t1 = time.perf_counter()
         buff_channels = active_channels.copy()
         for c in active_channels:
             data = c.recv()
@@ -30,11 +31,22 @@ def predict_process(net, channels):
             else:
                 boards.append(data)
         active_channels = buff_channels
+        t2 = time.perf_counter()
+        print(f'C: {round((t2 - t1) * 1000, 4)} ms')
 
+        t3 = time.perf_counter()
         [policy, value] = alpha_net.predict(boards)
         policy, value = policy.numpy(), value.numpy()
+        t4 = time.perf_counter()
+        print(f'N: {round((t4 - t3) * 1000, 4)} ms')
+
+        t5 = time.perf_counter()
         for idx, c in enumerate(active_channels):
             c.send([[policy[idx]], [value[idx]]])
+        t6 = time.perf_counter()
+
+        print(f'S: {round((t6 - t5) * 1000, 4)} ms')
+        print(f'1: {round((t6 - t1) * 1000 / n, 4)} ms')
 
 
 def multi_self_play(net, n=10, mcts_turns=100):
