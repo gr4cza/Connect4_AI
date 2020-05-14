@@ -14,11 +14,12 @@ EPSILON = 0.25
 
 class MCTS:  # noqa
 
-    def __init__(self, net, player, turns, multi_player) -> None:
+    def __init__(self, net, player, turns, multi_player, print_policy=False) -> None:
         self.net = net
         self.player = player
         self.turns = turns
         self.multi_player = multi_player
+        self.print_policy = print_policy
 
     def next_move(self, board, train=False):
         if not self.multi_player:
@@ -55,6 +56,8 @@ class MCTS:  # noqa
         return self._search_best_leaf(max(node.children.values(), key=lambda x: x.PUCT()))
 
     def _bets_action(self, node, train):
+        if self.print_policy:
+            print(self._policy(node))
         if not train:
             key, _ = max(node.children.items(), key=lambda x: x[1].N)
         else:

@@ -31,4 +31,6 @@ class AgentFactory:
         if agent_type == 'MonteCarlo':
             return MonteCarlo(player, 2000)
         if agent_type == 'AlphaZero':
-            return AlphaZero(player)
+            from alpha_zero.alpha_net import AlphaNet
+            alpha_net = AlphaNet('test_net_1_1_2_3')
+            return AlphaZero(player, net=alpha_net, mcts_turns=300, print_policy=True)
