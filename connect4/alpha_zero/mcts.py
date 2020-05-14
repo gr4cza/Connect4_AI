@@ -1,10 +1,12 @@
 from copy import deepcopy
 from math import sqrt
 from random import choice
-from board import C
-from alpha_zero.util import encode_board
-from board import PLAYER1, PLAYER2
+
 import numpy as np
+
+from alpha_zero.util import encode_board
+from board import C
+from board import PLAYER1, PLAYER2
 
 C_PUCT = 1
 EPSILON = 0.25
@@ -12,13 +14,18 @@ EPSILON = 0.25
 
 class MCTS:  # noqa
 
-    def __init__(self, net, player, turns) -> None:  # TODO megemelni a számott
+    def __init__(self, net, player, turns, multi_player) -> None:
         self.net = net
         self.player = player
         self.turns = turns
+        self.multi_player = multi_player
 
     def next_move(self, board, train=False):
-        root = Node(board, self.player)
+        if not self.multi_player:
+            root = Node(board, self.player)
+        else:
+            root = MultiNode(board, self.player)
+
         e_board = root.compute(self.net, root=True, train=train)
 
         for _ in range(self.turns):
@@ -92,8 +99,8 @@ class Node:
         column = choice([key for (key, value) in self.children.items() if value is None])
         board = deepcopy(self.board)
         board.add_token(column)
-        self.children[column] = Node(board, PLAYER1 if self.player == PLAYER2 else PLAYER2,
-                                     action=column, parent=self)
+        self.children[column] = self.__class__(board, PLAYER1 if self.player == PLAYER2 else PLAYER2,
+                                               action=column, parent=self)
         return self.children[column]
 
     def back_propagate(self, v):
@@ -105,7 +112,8 @@ class Node:
 
     def compute(self, net, root=False, train=False):
         e_board = encode_board(self.board)
-        [p], [[v]] = net.predict(e_board)
+        predict = self._predict(e_board, net)
+        [p], [[v]] = predict
         self.v = v
         if root:
             p = self._add_dirichlet_noise(p)
@@ -117,9 +125,22 @@ class Node:
             return self.v
 
     @staticmethod
+    def _predict(e_board, net):
+        return net.predict(e_board)
+
+    @staticmethod
     def _add_dirichlet_noise(p):
         return (1 - EPSILON) * p + \
                EPSILON * np.random.dirichlet([0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
+
+
+class MultiNode(Node):
+
+    @staticmethod
+    def _predict(e_board, net):
+        net.send(e_board)
+        rec = net.recv()
+        return rec[0], rec[1]
 
 
 class DummyNode:

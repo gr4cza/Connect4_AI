@@ -37,7 +37,7 @@ class AlphaNet:
         self._model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
 
     def predict(self, board):
-        return self._model.predict_on_batch(np.expand_dims(board, axis=0))
+        return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
 
     def load_model(self, file_name):
         pass
