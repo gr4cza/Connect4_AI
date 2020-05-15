@@ -3,7 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 
-# For avoid memmory leak
+# For avoid memory leak
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -16,8 +16,8 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
-from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Flatten, Input, Add
-from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Dense, Flatten, Input, Add  # noqa
+from tensorflow.keras.models import Model  # noqa
 
 REG_FACTOR = 0.0001
 KERNEL_SIZE = (3, 3)
@@ -52,12 +52,24 @@ class AlphaNet:
         model.compile(optimizer='adam',
                       loss={'policy_out': tf.keras.losses.CategoricalCrossentropy(),
                             'value_out': 'mean_squared_error'},
-                      # TODO own loss function ?
                       loss_weights=[0.5, 0.5])
         return model
 
     def train(self, data, epochs, new_name):
-        self._model.fit(data.board, {'policy_out': data.policy, 'value_out': data.value}, epochs=epochs)
+
+        # load dataset
+        train_dataset = tf.data.Dataset.from_tensor_slices(
+            (data.board, {'policy_out': data.policy, 'value_out': data.value}))
+
+        # prepare dataset
+        size = int(len(data.value) / 10)
+        train_dataset = train_dataset.shuffle(size, reshuffle_each_iteration=True).batch(32)\
+            .prefetch(tf.data.experimental.AUTOTUNE)
+
+        # learn on dataset
+        self._model.fit(train_dataset, epochs=epochs, verbose=2)
+
+        # save new model
         self.save_model(new_name)
         return new_name
 
