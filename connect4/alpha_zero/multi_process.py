@@ -41,14 +41,14 @@ def predict_process(net_name, channels):
             c.send([[p], [v]])
 
 
-def multi_self_play(net_name, hours=10, mcts_turns=100):
+def multi_self_play(net_name, hours, minutes, mcts_turns=100):
     pipes = [mp.Pipe() for _ in range(THREAD_COUNT)]
 
     predict_p = mp.Process(target=predict_process, args=(net_name, [pi[0] for pi in pipes]))
     predict_p.start()
 
     with mp.Pool(processes=THREAD_COUNT) as pool:
-        data = pool.starmap(self_play, [(pi[1], hours, mcts_turns, True) for pi in pipes])
+        data = pool.starmap(self_play, [(pi[1], hours, minutes, mcts_turns, True) for pi in pipes])
         pool.close()
         pool.join()
 
@@ -57,7 +57,7 @@ def multi_self_play(net_name, hours=10, mcts_turns=100):
     return data
 
 
-def self_play(net, hours=10, mcts_turns=100, multi_player=False):
+def self_play(net, hours, minutes, mcts_turns=100, multi_player=False):
     az_1 = AlphaZero(PLAYER1, net, mcts_turns=mcts_turns, multi_player=multi_player)
     az_2 = AlphaZero(PLAYER2, net, mcts_turns=mcts_turns, multi_player=multi_player)
 
@@ -69,7 +69,7 @@ def self_play(net, hours=10, mcts_turns=100, multi_player=False):
     random.seed(seed)
     np.random.seed(seed)
 
-    end_time = time.time() + datetime.timedelta(hours=hours).seconds
+    end_time = time.time() + datetime.timedelta(hours=hours, minutes=minutes).seconds
 
     i = 0
     while time.time() < end_time:
@@ -119,6 +119,18 @@ def v_value(winner, player):
         return np.array([1], dtype=np.float32)
     if winner != player:
         return np.array([-1], dtype=np.float32)
+
+
+def train_net_process(net_name, epochs):
+    data = GameData(net_name)
+
+    from alpha_zero.alpha_net import AlphaNet
+    loaded_net = AlphaNet(net_name)
+    # retrain
+    loaded_net.train(data, epochs=epochs)
+
+    # close net
+    loaded_net.release()
 
 
 def evaluate(net_1, net_2=None):

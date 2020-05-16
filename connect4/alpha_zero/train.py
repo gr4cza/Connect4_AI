@@ -1,31 +1,23 @@
+from multiprocessing import Process
 from time import strftime
 
 from alpha_zero.game_data import GameData
-from alpha_zero.multi_process import multi_self_play, evaluate
+from alpha_zero.multi_process import multi_self_play, evaluate, train_net_process
 
 
-def train(turns, hours, mcts_turns, epochs, net_name=None, source_net=None):
+def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None, source_net=None):
     # variables
-    from_source = False
-
-    if net_name is None and source_net is None:
-        net_name = 'test'
+    if source_net is not None:
+        net_name = source_net
+        print(f'Continuing train from {source_net}')
     else:
-        if source_net is not None and net_name is not None:
-            from_source = True
-
-        if net_name is None:
-            net_name = source_net
-        else:
-            net_name = net_name + f'_{strftime("%Y%m%d_%H%M")}'
+        net_name = net_name + f'_{strftime("%Y%m%d_%H%M")}'
+        print(f'New training with {net_name}')
     data = GameData(source_net)
 
     for i in range(turns):
         # self play
-        if not from_source:
-            data_run = multi_self_play(net_name=net_name, hours=hours, mcts_turns=mcts_turns)
-        else:
-            data_run = multi_self_play(net_name=source_net, hours=hours, mcts_turns=mcts_turns)
+        data_run = multi_self_play(net_name=net_name, hours=hours, minutes=minutes, mcts_turns=mcts_turns)
 
         # add new data to database
         data.add_games(data_run)
@@ -33,28 +25,14 @@ def train(turns, hours, mcts_turns, epochs, net_name=None, source_net=None):
         # save new database
         data.save(net_name)
 
-        # load net
-        from alpha_zero.alpha_net import AlphaNet
-        if not from_source:
-            loaded_net = AlphaNet(net_name)
-        else:
-            loaded_net = AlphaNet(source_net)
-
-        # retrain
-        if not from_source:
-            loaded_net.train(data, epochs=epochs)
-        else:
-            loaded_net.train(data, epochs=epochs, new_model_name=net_name)
-
-        # close net
-        loaded_net.release()
+        # load net & train
+        p = Process(target=train_net_process, args=(net_name, epochs))
+        p.start()
+        p.join()
 
         # evaluate
-        if not from_source:
-            evaluate(net_name)
-        else:
-            from_source = evaluate(net_name, source_net)
+        evaluate(net_name)
 
 
 if __name__ == '__main__':
-    train(turns=3, hours=0.1, mcts_turns=20, epochs=3)
+    train(net_name='test', turns=3, minutes=5, mcts_turns=20, epochs=3)
