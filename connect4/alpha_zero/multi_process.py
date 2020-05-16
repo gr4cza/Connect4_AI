@@ -65,8 +65,9 @@ def self_play(net, hours=10, mcts_turns=100, multi_player=False):
     pid = os.getpid()
 
     # seed randoms with pid+time
-    random.seed(pid+time.time())
-    np.random.seed(pid+time.time())
+    seed = int(pid+time.time())
+    random.seed(seed)
+    np.random.seed(seed)
 
     end_time = time.time() + datetime.timedelta(hours=hours).seconds
 
