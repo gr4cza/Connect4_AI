@@ -1,4 +1,6 @@
+import json
 import os
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -24,11 +26,13 @@ KERNEL_SIZE = (3, 3)
 FILTERS = 128
 CONV_LAYER_COUNT = 20
 
-DATA_PATH = f'{os.path.dirname(__file__)}/training_data/'
+BASE_DIR = f'{os.path.dirname(__file__)}/training_data/models/'
 
 
 class AlphaNet:
     def __init__(self, model_name):
+        self.model_name = model_name
+
         model_path = self._get_model_path(model_name)
 
         if self._check_model_exists(model_path):
@@ -51,11 +55,10 @@ class AlphaNet:
         model = Model(inp, outputs=[policy_out, value_out])
         model.compile(optimizer='adam',
                       loss={'policy_out': tf.keras.losses.CategoricalCrossentropy(),
-                            'value_out': 'mean_squared_error'},
-                      loss_weights=[0.5, 0.5])
+                            'value_out': 'mean_squared_error'})
         return model
 
-    def train(self, data, epochs, new_name):
+    def train(self, data, epochs, new_model_name=None):
 
         # load dataset
         train_dataset = tf.data.Dataset.from_tensor_slices(
@@ -63,37 +66,75 @@ class AlphaNet:
 
         # prepare dataset
         size = int(len(data.value) / 10)
-        train_dataset = train_dataset.shuffle(size, reshuffle_each_iteration=True).batch(32)\
+        train_dataset = train_dataset.shuffle(size, reshuffle_each_iteration=True).batch(32) \
             .prefetch(tf.data.experimental.AUTOTUNE)
 
         # learn on dataset
         self._model.fit(train_dataset, epochs=epochs, verbose=2)
 
         # save new model
-        self.save_model(new_name)
-        return new_name
+        self.save_model(new_model_name)
 
     def predict(self, board):
         return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
 
-    def load_model(self, file_name):
-        file_path = self._get_model_path(file_name)
-        if self._check_model_exists(file_path):
-            self._model = tf.keras.models.load_model(file_path)
-        else:
-            print(f'Saved model "{file_name}" does not exists!')
+    def load_model(self, model_name):
+        file_path = self._get_model_path(model_name)
 
-    def save_model(self, file_name):
-        file_path = self._get_model_path(file_name)
-        self._model.save(file_path)
+        if self._check_model_exists(file_path):
+            best_model = self._get_best_model(file_path)
+            self._model = tf.keras.models.load_model(best_model)
+        else:
+            print(f'Saved model "{model_name}" does not exists (or corrupted)!')
+
+    def save_model(self, model_name):
+        if model_name is None:
+            model_name = self.model_name
+        file_path = self._get_model_path(model_name)
+        new_model_path = self._get_new_model_number(file_path)
+        self._model.save(new_model_path)
 
     @staticmethod
-    def _get_model_path(file_name):
-        return DATA_PATH + f'models/{file_name}/'
+    def _get_model_path(model_name):
+        return BASE_DIR + f'{model_name}/'
 
     @staticmethod
     def _check_model_exists(model_path):
         return os.path.exists(model_path)
+
+    @staticmethod
+    def _get_best_model(file_path):
+        if not os.path.exists(file_path + 'catalog.json'):
+            best_net_number = AlphaNet.create_data_json(file_path)
+        else:
+            with open(file_path + 'catalog.json', 'r')as f:
+                data = json.load(f)
+                best_net_number = data['best_net']
+        print(f'loaded best net version: {best_net_number:02}')
+        return file_path + f'{best_net_number:02}/'
+
+    @staticmethod
+    def create_data_json(file_path):
+        Path(file_path).mkdir(parents=True, exist_ok=True)
+
+        with open(file_path + 'catalog.json', 'w')as f:
+            data = {'best_net': 0, 'latest_net': 0}
+            f.write(json.dumps(data))
+            return data['best_net']
+
+    @staticmethod
+    def _get_new_model_number(file_path):
+        if not os.path.exists(file_path + 'catalog.json'):
+            new_model_number = AlphaNet.create_data_json(file_path)
+        else:
+            with open(file_path + 'catalog.json', 'r+')as f:
+                data = json.load(f)
+                f.seek(0)
+                data['latest_net'] += 1
+                data['best_net'] += 1  # TODO remove
+                f.write(json.dumps(data))
+                new_model_number = data['latest_net']
+        return file_path + f'{new_model_number:02}/'
 
     def release(self):
         del self._model

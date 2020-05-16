@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import os
 
 import numpy as np
 
@@ -10,14 +11,14 @@ THREAD_COUNT = 5
 
 
 def predict_process(net_name, channels):
-    print(f'Predict process started with net {net_name}')
+    print(f'Predict process started with "{net_name}"')
     active_channels = channels
 
     # Placed here, to not load in every process
     from alpha_zero.alpha_net import AlphaNet
     alpha_net = AlphaNet(net_name)
 
-    while len(active_channels):
+    while len(active_channels) != 0:
         boards = []
 
         buff_channels = active_channels.copy()
@@ -58,9 +59,10 @@ def self_play(net, n=10, mcts_turns=100, multi_player=False):
     az_2 = AlphaZero(PLAYER2, net, mcts_turns=mcts_turns, multi_player=multi_player)
 
     game_data = GameData()
+    pid = os.getpid()
 
     for i in range(n):
-        print(f'self play {i + 1} starting')
+        print(f'[{pid}] self play {i + 1} starting')
         board = Board()
         current_player = PLAYER1
 
@@ -105,3 +107,7 @@ def v_value(winner, player):
         return np.array([1], dtype=np.float32)
     if winner != player:
         return np.array([-1], dtype=np.float32)
+
+
+def evaluate(net_1, net_2=None):
+    return False  # TODO
