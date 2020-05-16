@@ -12,7 +12,6 @@ def train(turns, net_name=None, source_net=None):
     from_source = False
     if source_net and net_name is not None:
         from_source = True
-        pass  # TODO
 
     if source_net and net_name is None:
         net_name = source_net
@@ -53,7 +52,7 @@ def train(turns, net_name=None, source_net=None):
         if not from_source:
             evaluate(net_name)
         else:
-            from_source = evaluate(net_name, source_net)  # TODO
+            from_source = evaluate(net_name, source_net)
 
 
 if __name__ == '__main__':

@@ -117,10 +117,13 @@ class Node:
         e_board = encode_board(self.board)
         [p], [[v]] = self._predict(e_board, net)
         self.v = v
+
         if root:
             p = self._add_dirichlet_noise(p)
+
         for idx, value in enumerate(p):
             self.P[idx] = value
+
         if train:
             return e_board
         else:
