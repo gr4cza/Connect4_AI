@@ -6,17 +6,18 @@ from alpha_zero.multi_process import multi_self_play, evaluate
 
 def train(turns, hours, mcts_turns, epochs, net_name=None, source_net=None):
     # variables
+    from_source = False
+
     if net_name is None and source_net is None:
         net_name = 'test'
-
-    from_source = False
-    if source_net and net_name is not None:
-        from_source = True
-
-    if source_net and net_name is None:
-        net_name = source_net
     else:
-        net_name = net_name + f'_{strftime("%Y%m%d_%H%M")}'
+        if source_net is not None and net_name is not None:
+            from_source = True
+
+        if net_name is None:
+            net_name = source_net
+        else:
+            net_name = net_name + f'_{strftime("%Y%m%d_%H%M")}'
     data = GameData(source_net)
 
     for i in range(turns):

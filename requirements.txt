@@ -4,3 +4,4 @@ gmpy2==2.0.8
 
 tensorflow-gpu==2.1.0
 pygame>=1.9.6
+scipy==1.4.1

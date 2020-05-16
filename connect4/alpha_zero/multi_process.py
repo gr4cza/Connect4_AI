@@ -1,6 +1,7 @@
 import datetime
 import multiprocessing as mp
 import os
+import random
 import time
 
 import numpy as np
@@ -62,6 +63,10 @@ def self_play(net, hours=10, mcts_turns=100, multi_player=False):
 
     game_data = GameData()
     pid = os.getpid()
+
+    # seed randoms with pid+time
+    random.seed(pid+time.time())
+    np.random.seed(pid+time.time())
 
     end_time = time.time() + datetime.timedelta(hours=hours).seconds
 

@@ -3,6 +3,7 @@ from math import sqrt
 from random import choice
 
 import numpy as np
+from scipy.special import softmax
 
 from alpha_zero.util import encode_board
 from board import C
@@ -116,6 +117,7 @@ class Node:
     def compute(self, net, root=False, train=False):
         e_board = encode_board(self.board)
         [p], [[v]] = self._predict(e_board, net)
+        p = softmax(p)
         self.v = v
 
         if root:

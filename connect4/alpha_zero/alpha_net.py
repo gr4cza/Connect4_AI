@@ -53,10 +53,15 @@ class AlphaNet:
         value_out = ValueLayer(name='value_out')(x)
 
         model = Model(inp, outputs=[policy_out, value_out])
-        model.compile(optimizer='adam',
-                      loss={'policy_out': tf.keras.losses.CategoricalCrossentropy(),
-                            'value_out': 'mean_squared_error'})
+        AlphaNet._compile(model)
         return model
+
+    @staticmethod
+    def _compile(model):
+        model.compile(optimizer='adam',
+                      loss={'policy_out': tf.nn.softmax_cross_entropy_with_logits,
+                            'value_out': 'mean_squared_error'},
+                      loss_weights=[0.5, 0.5])
 
     def train(self, data, epochs, new_model_name=None):
 
@@ -83,7 +88,8 @@ class AlphaNet:
 
         if self._check_model_exists(file_path):
             best_model = self._get_best_model(file_path)
-            self._model = tf.keras.models.load_model(best_model)
+            self._model = tf.keras.models.load_model(best_model, compile=False)
+            self._compile(self._model)
         else:
             print(f'Saved model "{model_name}" does not exists (or corrupted)!')
 
@@ -141,6 +147,10 @@ class AlphaNet:
         tf.keras.backend.clear_session()
 
 
+def cross_entropy_loss(y_true, y_pred):
+    return tf.math.negative(tf.math.reduce_sum(tf.math.multiply_no_nan(tf.math.log(y_pred), y_true)))
+
+
 class ConvLayer(Layer):
     def __init__(self):
         super().__init__()
@@ -193,8 +203,7 @@ class PolicyLayer(Layer):
         x = tf.nn.relu(x)
 
         x = self.flatten(x)
-        x = self.dense(x)
-        return tf.nn.softmax(x)
+        return self.dense(x)
 
 
 class ValueLayer(Layer):
