@@ -4,7 +4,7 @@ from alpha_zero.game_data import GameData
 from alpha_zero.multi_process import multi_self_play, evaluate
 
 
-def train(turns, net_name=None, source_net=None):
+def train(turns, hours, mcts_turns, epochs, net_name=None, source_net=None):
     # variables
     if net_name is None and source_net is None:
         net_name = 'test'
@@ -22,9 +22,9 @@ def train(turns, net_name=None, source_net=None):
     for i in range(turns):
         # self play
         if not from_source:
-            data_run = multi_self_play(net_name=net_name, n=10, mcts_turns=20)
+            data_run = multi_self_play(net_name=net_name, hours=hours, mcts_turns=mcts_turns)
         else:
-            data_run = multi_self_play(net_name=source_net, n=10, mcts_turns=20)
+            data_run = multi_self_play(net_name=source_net, hours=hours, mcts_turns=mcts_turns)
 
         # add new data to database
         data.add_games(data_run)
@@ -41,9 +41,9 @@ def train(turns, net_name=None, source_net=None):
 
         # retrain
         if not from_source:
-            loaded_net.train(data, epochs=3)
+            loaded_net.train(data, epochs=epochs)
         else:
-            loaded_net.train(data, epochs=3, new_model_name=net_name)
+            loaded_net.train(data, epochs=epochs, new_model_name=net_name)
 
         # close net
         loaded_net.release()
@@ -56,4 +56,4 @@ def train(turns, net_name=None, source_net=None):
 
 
 if __name__ == '__main__':
-    train(turns=3, )
+    train(turns=3, hours=0.1, mcts_turns=20, epochs=3)

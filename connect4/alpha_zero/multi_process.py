@@ -1,5 +1,7 @@
+import datetime
 import multiprocessing as mp
 import os
+import time
 
 import numpy as np
 
@@ -38,14 +40,14 @@ def predict_process(net_name, channels):
             c.send([[p], [v]])
 
 
-def multi_self_play(net_name, n=10, mcts_turns=100):
+def multi_self_play(net_name, hours=10, mcts_turns=100):
     pipes = [mp.Pipe() for _ in range(THREAD_COUNT)]
 
     predict_p = mp.Process(target=predict_process, args=(net_name, [pi[0] for pi in pipes]))
     predict_p.start()
 
     with mp.Pool(processes=THREAD_COUNT) as pool:
-        data = pool.starmap(self_play, [(pi[1], n, mcts_turns, True) for pi in pipes])
+        data = pool.starmap(self_play, [(pi[1], hours, mcts_turns, True) for pi in pipes])
         pool.close()
         pool.join()
 
@@ -54,15 +56,19 @@ def multi_self_play(net_name, n=10, mcts_turns=100):
     return data
 
 
-def self_play(net, n=10, mcts_turns=100, multi_player=False):
+def self_play(net, hours=10, mcts_turns=100, multi_player=False):
     az_1 = AlphaZero(PLAYER1, net, mcts_turns=mcts_turns, multi_player=multi_player)
     az_2 = AlphaZero(PLAYER2, net, mcts_turns=mcts_turns, multi_player=multi_player)
 
     game_data = GameData()
     pid = os.getpid()
 
-    for i in range(n):
-        print(f'[{pid}] self play {i + 1} starting')
+    end_time = time.time() + datetime.timedelta(hours=hours).seconds
+
+    i = 0
+    while time.time() < end_time:
+        i += 1
+        print(f'[{pid}] self play {i} starting')
         board = Board()
         current_player = PLAYER1
 
