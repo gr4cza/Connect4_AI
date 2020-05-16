@@ -39,7 +39,7 @@ class AlphaNet:
             self.load_model(model_name)
         else:
             self._model = self._build_model()
-            self.save_model(model_name)
+            self.save_model()
 
     @staticmethod
     def _build_model():
@@ -63,7 +63,7 @@ class AlphaNet:
                             'value_out': 'mean_squared_error'},
                       loss_weights=[0.5, 0.5])
 
-    def train(self, data, epochs, new_model_name=None):
+    def train(self, data, epochs):
 
         # load dataset
         train_dataset = tf.data.Dataset.from_tensor_slices(
@@ -78,7 +78,7 @@ class AlphaNet:
         self._model.fit(train_dataset, epochs=epochs, verbose=2)
 
         # save new model
-        self.save_model(new_model_name)
+        self.save_model()
 
     def predict(self, board):
         return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
@@ -93,10 +93,8 @@ class AlphaNet:
         else:
             print(f'Saved model "{model_name}" does not exists (or corrupted)!')
 
-    def save_model(self, model_name):
-        if model_name is None:
-            model_name = self.model_name
-        file_path = self._get_model_path(model_name)
+    def save_model(self):
+        file_path = self._get_model_path(self.model_name)
         new_model_path = self._get_new_model_number(file_path)
         self._model.save(new_model_path)
 
@@ -116,7 +114,7 @@ class AlphaNet:
             with open(file_path + 'catalog.json', 'r')as f:
                 data = json.load(f)
                 best_net_number = data['best_net']
-        print(f'loaded best net version: {best_net_number:02}')
+        print(f'Loaded net version: {best_net_number:02}')
         return file_path + f'{best_net_number:02}/'
 
     @staticmethod
