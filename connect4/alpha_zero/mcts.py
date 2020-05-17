@@ -15,18 +15,22 @@ EPSILON = 0.25
 
 class MCTS:  # noqa
 
-    def __init__(self, net, player, turns, multi_player, print_policy=False) -> None:
+    def __init__(self, net, player, turns, multi_process, print_policy=False, net_type=None):
         self.net = net
         self.player = player
         self.turns = turns
-        self.multi_player = multi_player
+        self.multi_process = multi_process
+        self.net_type = net_type
         self.print_policy = print_policy
 
     def next_move(self, board, train=False):
-        if not self.multi_player:
-            root = Node(board, self.player)
-        else:
+        if self.multi_process:
             root = MultiNode(board, self.player)
+        elif self.net_type is not None:
+            root = PlayAgainstNode(board, self.player,
+                                   net_type=self.net_type)
+        else:
+            root = Node(board, self.player)
 
         e_board = root.compute(self.net, root=True, train=train)
 
@@ -148,6 +152,27 @@ class MultiNode(Node):
         net.send(e_board)
         rec = net.recv()
         return rec[0], rec[1]
+
+
+class PlayAgainstNode(Node):
+
+    def __init__(self, board, player, action=-1, parent=None, net_type=None) -> None:
+        super().__init__(board, player, action, parent)
+        self.net_type = net_type
+
+    def _predict(self, e_board, net):
+        data = {'type': self.net_type, 'board': e_board}
+        net.send(data)
+        rec = net.recv()
+        return rec[0], rec[1]
+
+    def expand(self):
+        column = choice([key for (key, value) in self.children.items() if value is None])
+        board = deepcopy(self.board)
+        board.add_token(column)
+        self.children[column] = self.__class__(board, PLAYER1 if self.player == PLAYER2 else PLAYER2,
+                                               action=column, parent=self, net_type=self.net_type)
+        return self.children[column]
 
 
 class DummyNode:

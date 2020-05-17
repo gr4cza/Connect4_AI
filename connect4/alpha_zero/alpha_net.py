@@ -30,13 +30,13 @@ BASE_DIR = f'{os.path.dirname(__file__)}/training_data/models/'
 
 
 class AlphaNet:
-    def __init__(self, model_name):
+    def __init__(self, model_name, is_latest=False):
         self.model_name = model_name
 
         model_path = self._get_model_path(model_name)
 
         if self._check_model_exists(model_path):
-            self.load_model(model_name)
+            self.load_model(model_name, is_latest)
         else:
             self._model = self._build_model()
             self.save_model()
@@ -83,12 +83,12 @@ class AlphaNet:
     def predict(self, board):
         return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
 
-    def load_model(self, model_name):
+    def load_model(self, model_name, is_latest):
         file_path = self._get_model_path(model_name)
 
         if self._check_model_exists(file_path):
-            best_model = self._get_best_model(file_path)
-            self._model = tf.keras.models.load_model(best_model, compile=False)
+            model = self._get_model(file_path, is_latest)
+            self._model = tf.keras.models.load_model(model, compile=False)
             self._compile(self._model)
         else:
             print(f'Saved model "{model_name}" does not exists (or corrupted)!')
@@ -107,15 +107,15 @@ class AlphaNet:
         return os.path.exists(model_path)
 
     @staticmethod
-    def _get_best_model(file_path):
+    def _get_model(file_path, is_latest):
         if not os.path.exists(file_path + 'catalog.json'):
-            best_net_number = AlphaNet.create_data_json(file_path)
+            net_number = AlphaNet.create_data_json(file_path)
         else:
             with open(file_path + 'catalog.json', 'r')as f:
                 data = json.load(f)
-                best_net_number = data['best_net']
-        print(f'Loaded net version: {best_net_number:02}')
-        return file_path + f'{best_net_number:02}/'
+                net_number = data['best_net'] if not is_latest else data['latest_net']
+        print(f'Loading net version: {net_number:02}')
+        return file_path + f'{net_number:02}/'
 
     @staticmethod
     def create_data_json(file_path):
@@ -135,7 +135,7 @@ class AlphaNet:
                 data = json.load(f)
                 f.seek(0)
                 data['latest_net'] += 1
-                data['best_net'] += 1  # TODO remove
+                # data['best_net'] += 1  # TODO remove
                 f.write(json.dumps(data))
                 new_model_number = data['latest_net']
         return file_path + f'{new_model_number:02}/'

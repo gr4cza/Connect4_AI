@@ -72,9 +72,6 @@ class GameData:
     def value(self):
         return np.array(self.values)
 
-    def __str__(self) -> str:
-        return f'Game_Data: {len(self.boards)} states in {self.game_count} games'
-
     @staticmethod
     def _get_last_iteration(path, add=False):
         if not os.path.exists(path + 'catalog.json'):
@@ -101,6 +98,9 @@ class GameData:
             self.values = self.values[positions:]
             self.policies = self.policies[positions:]
             self.game_count = self.max_games
+
+    def __str__(self) -> str:
+        return f'Game_Data: {len(self.boards)} states in {self.game_count} games'
 
 
 if __name__ == '__main__':

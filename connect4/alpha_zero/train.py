@@ -31,7 +31,7 @@ def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None,
         p.join()
 
         # evaluate
-        evaluate(net_name)
+        evaluate(net_name, 100, mcts_turns)
 
 
 if __name__ == '__main__':
