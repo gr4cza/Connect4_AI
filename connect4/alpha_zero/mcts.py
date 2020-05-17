@@ -114,7 +114,7 @@ class Node:
 
     def back_propagate(self, v):
         self.N += 1
-        v1 = -v if self.player != self.root_player else v
+        v1 = -v if self.player == self.root_player else v
         self.W += v1
         if self.parent:
             self.parent.back_propagate(v)
