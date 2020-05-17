@@ -72,6 +72,16 @@ class GameData:
     def value(self):
         return np.array(self.values)
 
+    def get_train_data(self):
+        split_size = int(len(self.boards) * 0.90)
+        return np.array(self.boards[:split_size]), np.array(self.policies[:split_size]), np.array(
+            self.values[:split_size])
+
+    def get_val_data(self):
+        split_size = int(len(self.boards) * 0.90)
+        return np.array(self.boards[split_size:]), np.array(self.policies[split_size:]), np.array(
+            self.values[split_size:])
+
     @staticmethod
     def _get_last_iteration(path, add=False):
         if not os.path.exists(path + 'catalog.json'):

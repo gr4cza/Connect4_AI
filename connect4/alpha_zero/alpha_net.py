@@ -64,18 +64,25 @@ class AlphaNet:
                       loss_weights=[0.5, 0.5])
 
     def train(self, data, epochs):
+        board_train, policy_train, value_train = data.get_train_data()
+        board_val, policy_val, value_val = data.get_val_data()
 
         # load dataset
         train_dataset = tf.data.Dataset.from_tensor_slices(
-            (data.board, {'policy_out': data.policy, 'value_out': data.value}))
+            (board_train, {'policy_out': policy_train, 'value_out': value_train}))
+
+        val_dataset = tf.data.Dataset.from_tensor_slices(
+            (board_val, {'policy_out': policy_val, 'value_out': value_val}))
 
         # prepare dataset
         size = int(len(data.value) / 10)
         train_dataset = train_dataset.shuffle(size, reshuffle_each_iteration=True).batch(32) \
             .prefetch(tf.data.experimental.AUTOTUNE)
 
+        val_dataset = val_dataset.batch(32)
+
         # learn on dataset
-        history = self._model.fit(train_dataset, epochs=epochs, verbose=2)
+        history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset)
         self._save_history(history)
 
         # save new model
