@@ -10,11 +10,14 @@ BASE_DIR = f'{os.path.dirname(__file__)}/training_data/data/'
 
 class GameData:
 
-    def __init__(self, directory_name=None):
+    def __init__(self, directory_name=None, max_games=50_000):
         self.boards = []
         self.policies = []
         self.values = []
+
         self.game_count = 0
+        self.max_games = max_games
+        self.game_lengths = []
         if directory_name:
             self.load_from_directory(directory_name)
 
@@ -23,15 +26,21 @@ class GameData:
         self.policies.append(policy)
 
     def add_winner(self, value):
-        self.values.extend([value] * len(self.boards))
+        length = len(self.boards)
+        self.values.extend([value] * length)
+
         self.game_count += 1
+        self.game_lengths.append(length)
 
     def add_games(self, games):
         for game in games:
             self.boards.extend(game.boards)
             self.policies.extend(game.policies)
             self.values.extend(game.values)
+            self.game_lengths.extend(game.game_lengths)
             self.game_count += game.game_count
+
+        self._purge()
 
     def load_from_directory(self, name):
         path = BASE_DIR + f'{name}/'
@@ -82,7 +91,18 @@ class GameData:
                 f.write(json.dumps(data))
                 return data['last_item']
 
+    def _purge(self):
+        if self.game_count > self.max_games:
+            delta = self.game_count - self.max_games
+            positions = sum(self.game_lengths[:delta])
+            self.game_lengths = self.game_lengths[delta:]
+
+            self.boards = self.boards[positions:]
+            self.values = self.values[positions:]
+            self.policies = self.policies[positions:]
+            self.game_count = self.max_games
+
 
 if __name__ == '__main__':
-    gd = GameData('test_20200516_0128')
+    gd = GameData('first_cloud_test_20200516_0214')
     print(gd)
