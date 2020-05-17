@@ -75,7 +75,8 @@ class AlphaNet:
             .prefetch(tf.data.experimental.AUTOTUNE)
 
         # learn on dataset
-        self._model.fit(train_dataset, epochs=epochs, verbose=2)
+        history = self._model.fit(train_dataset, epochs=epochs, verbose=2)
+        self._save_history(history)
 
         # save new model
         self.save_model()
@@ -135,7 +136,6 @@ class AlphaNet:
                 data = json.load(f)
                 f.seek(0)
                 data['latest_net'] += 1
-                # data['best_net'] += 1  # TODO remove
                 f.write(json.dumps(data))
                 new_model_number = data['latest_net']
         return file_path + f'{new_model_number:02}/'
@@ -143,6 +143,10 @@ class AlphaNet:
     def release(self):
         del self._model
         tf.keras.backend.clear_session()
+
+    @staticmethod
+    def _save_history(history):
+        print(history)
 
 
 def cross_entropy_loss(y_true, y_pred):

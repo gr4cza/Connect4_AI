@@ -102,6 +102,9 @@ class GameData:
     def __str__(self) -> str:
         return f'Game_Data: {len(self.boards)} states in {self.game_count} games'
 
+    def __len__(self):
+        return len(self.values)
+
 
 if __name__ == '__main__':
     gd = GameData('first_cloud_test_20200516_0214')

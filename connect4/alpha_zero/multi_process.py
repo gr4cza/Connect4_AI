@@ -225,11 +225,11 @@ def play_against(net, times, mcts_turns, best_first):
 
         while not board.is_game_over():
             if current_player == PLAYER1:
-                action, _ = player_1.move(board, train=True)
+                action, _ = player_1.move(board)
                 board.add_token(action)
                 current_player = PLAYER2
             elif current_player == PLAYER2:
-                action, _ = player_2.move(board, train=True)
+                action, _ = player_2.move(board)
                 board.add_token(action)
                 current_player = PLAYER1
         print(f'O:{"l" if not best_first else "b"} X:{"b" if not best_first else "l"}')
