@@ -1,6 +1,7 @@
 import json
 import os
 import pickle
+import pandas as pd
 from pathlib import Path
 
 import numpy as np
@@ -84,10 +85,9 @@ class AlphaNet:
 
         # learn on dataset
         history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset)
-        self._save_history(history, self._get_model_path(self.model_name))
 
         # save new model
-        self.save_model()
+        self.save_model(history)
 
     def predict(self, board):
         return self._model.predict_on_batch(np.reshape(board, (-1, 6, 7, 3)))
@@ -102,9 +102,11 @@ class AlphaNet:
         else:
             print(f'Saved model "{model_name}" does not exists (or corrupted)!')
 
-    def save_model(self):
+    def save_model(self, history=None):
         file_path = self._get_model_path(self.model_name)
         new_model_path = self._get_new_model_number(file_path)
+        if history is not None:
+            self._save_history(history, new_model_path)
         self._model.save(new_model_path)
 
     @staticmethod
@@ -154,8 +156,9 @@ class AlphaNet:
 
     @staticmethod
     def _save_history(history, file_path):
-        with open(file_path+'history.pkl', 'w')as f:
-            pickle.dump(history.history, f)
+        with open(file_path + 'history.json', 'w')as f:
+            df = pd.DataFrame.from_dict(history.history)
+            json.dump(df.to_json(), f)
 
 
 def cross_entropy_loss(y_true, y_pred):
