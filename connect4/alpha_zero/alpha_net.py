@@ -1,5 +1,6 @@
 import json
 import os
+import pickle
 from pathlib import Path
 
 import numpy as np
@@ -152,8 +153,9 @@ class AlphaNet:
         tf.keras.backend.clear_session()
 
     @staticmethod
-    def _save_history(history):
-        print(history)
+    def _save_history(history, file_path):
+        with open(file_path+'history.pkl', 'w')as f:
+            pickle.dump(history, f)
 
 
 def cross_entropy_loss(y_true, y_pred):
