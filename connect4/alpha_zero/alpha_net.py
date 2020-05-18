@@ -84,7 +84,7 @@ class AlphaNet:
 
         # learn on dataset
         history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset)
-        self._save_history(history)
+        self._save_history(history, self._get_model_path(self.model_name))
 
         # save new model
         self.save_model()
