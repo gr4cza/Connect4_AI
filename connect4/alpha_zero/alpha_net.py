@@ -105,9 +105,9 @@ class AlphaNet:
     def save_model(self, history=None):
         file_path = self._get_model_path(self.model_name)
         new_model_path = self._get_new_model_number(file_path)
+        self._model.save(new_model_path)
         if history is not None:
             self._save_history(history, new_model_path)
-        self._model.save(new_model_path)
 
     @staticmethod
     def _get_model_path(model_name):
