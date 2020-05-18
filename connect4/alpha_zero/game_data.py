@@ -117,5 +117,5 @@ class GameData:
 
 
 if __name__ == '__main__':
-    gd = GameData('first_cloud_test_20200516_0214')
+    gd = GameData('full_test_20200517_1857')
     print(gd)
