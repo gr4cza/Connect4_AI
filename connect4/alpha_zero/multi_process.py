@@ -5,7 +5,6 @@ import multiprocessing as mp
 import os
 import random
 import time
-import gc
 
 import numpy as np
 
@@ -40,7 +39,6 @@ def predict_process(net_name, channels):
         active_channels = buff_channels
 
         predict_and_send(alpha_net, boards, active_channels)
-        gc.collect()
 
 
 def match_process(net_name, channels):
@@ -80,7 +78,6 @@ def match_process(net_name, channels):
 
         # best
         predict_and_send(alpha_net_best, boards_best, channel_best)
-        gc.collect()
 
 
 def predict_and_send(net, boards, channels):
@@ -194,7 +191,6 @@ def self_play(net, hours, minutes, mcts_turns, multi_process=False):
         p2_data.add_winner(p2_v)
 
         game_data.add_games([p1_data, p2_data])
-        gc.collect()
 
     if multi_process:
         net.send('Finished')
