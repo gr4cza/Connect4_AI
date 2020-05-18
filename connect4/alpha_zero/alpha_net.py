@@ -155,7 +155,7 @@ class AlphaNet:
     @staticmethod
     def _save_history(history, file_path):
         with open(file_path+'history.pkl', 'w')as f:
-            pickle.dump(history, f)
+            pickle.dump(history.history, f)
 
 
 def cross_entropy_loss(y_true, y_pred):
