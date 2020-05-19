@@ -18,7 +18,7 @@ class GameData:
         self.game_count = 0
         self.max_games = max_games
         self.game_lengths = []
-        if directory_name:
+        if directory_name is not None:
             self.load_from_directory(directory_name)
 
     def add_play(self, board, policy):
