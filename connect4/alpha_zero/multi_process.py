@@ -126,7 +126,7 @@ def evaluate(net_name, times, mcts_turns):
 
     match_p.join()
 
-    if l / (l + b) > 0.55:
+    if l / (l + b) > 0.5:
         update_best_net_to_latest(net_name)
 
 

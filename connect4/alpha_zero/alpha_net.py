@@ -1,13 +1,13 @@
 import json
 import os
-import pickle
-import pandas as pd
 from pathlib import Path
+from sklearn.model_selection import train_test_split
 
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 
-# For avoid memory leak
+# For avoid memory allocation crash on GPU
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -66,8 +66,8 @@ class AlphaNet:
                       loss_weights=[0.5, 0.5])
 
     def train(self, data, epochs):
-        board_train, policy_train, value_train = data.get_train_data()
-        board_val, policy_val, value_val = data.get_val_data()
+        board_train, board_val, policy_train, policy_val, value_train, value_val = \
+            train_test_split(data.board, data.policy, data.value, test_size=0.05)
 
         # load dataset
         train_dataset = tf.data.Dataset.from_tensor_slices(
@@ -77,8 +77,7 @@ class AlphaNet:
             (board_val, {'policy_out': policy_val, 'value_out': value_val}))
 
         # prepare dataset
-        size = int(len(data.value) / 10)
-        train_dataset = train_dataset.shuffle(size, reshuffle_each_iteration=True).batch(32) \
+        train_dataset = train_dataset.shuffle(1024, reshuffle_each_iteration=True).batch(32) \
             .prefetch(tf.data.experimental.AUTOTUNE)
 
         val_dataset = val_dataset.batch(32)
