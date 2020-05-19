@@ -122,12 +122,13 @@ def evaluate(net_name, times, mcts_turns):
     l = sum([d[0] for d in data])
     b = sum([d[1] for d in data])
     t = sum([d[2] for d in data])
-    print(f'Latest:{l} Best:{b} Tie:{t}')
+    print(f'Latest:{l} Current best:{b} Tie:{t}')
 
     match_p.join()
 
     if l / (l + b) > 0.5:
         update_best_net_to_latest(net_name)
+        print('Net version updated')
 
 
 def train_net_process(net_name, epochs):
@@ -238,10 +239,13 @@ def play_against(net, times, mcts_turns, best_first):
         winner = board.winner
         if winner == PLAYER1:
             p1 += 1
+            print('W:O')
         elif winner == PLAYER2:
             p2 += 1
+            print('W:X')
         elif winner == NO_ONE:
             t += 1
+            print('W:T')
 
     net.send('Finished')
 

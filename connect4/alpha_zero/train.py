@@ -6,6 +6,10 @@ from alpha_zero.multi_process import multi_self_play, evaluate, train_net_proces
 
 
 def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None, source_net=None, train_first=False):
+    print(f'Training started with turns ={turns}, hours={hours}, minutes={minutes}, mcts_turns={mcts_turns}, '
+          f'net_name={net_name}, source_net={source_net}, train_first={train_first}\n '
+          f'Time:{strftime("%Y.%m.%d. %H:%M")}')
+
     # variables
     if source_net is not None:
         net_name = source_net
@@ -25,6 +29,8 @@ def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None,
 
             # save new database
             data.save(net_name)
+
+        print(data)
 
         # load net & train
         p = Process(target=train_net_process, args=(net_name, epochs))
