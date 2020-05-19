@@ -17,20 +17,20 @@ def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None,
     else:
         net_name = net_name + f'_{strftime("%Y%m%d_%H%M")}'
         print(f'New training with {net_name}')
-    data = GameData(source_net)
+    game_data = GameData(source_net)
 
     for i in range(turns):
         if not train_first:
             # self play
             data_run = multi_self_play(net_name=net_name, hours=hours, minutes=minutes, mcts_turns=mcts_turns)
 
-            # add new data to database
-            data.add_games(data_run)
+            # add new game_data to database
+            game_data.add_games(data_run)
 
             # save new database
-            data.save(net_name)
+            game_data.save(net_name)
 
-        print(data)
+        print(game_data)
 
         # load net & train
         p = Process(target=train_net_process, args=(net_name, epochs))
