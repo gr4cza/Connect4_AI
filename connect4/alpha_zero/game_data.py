@@ -10,7 +10,7 @@ BASE_DIR = f'{os.path.dirname(__file__)}/training_data/data/'
 
 class GameData:
 
-    def __init__(self, directory_name=None, max_games=50_000):
+    def __init__(self, directory_name=None, max_games=80_000):
         self.boards = []
         self.policies = []
         self.values = []

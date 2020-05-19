@@ -67,7 +67,7 @@ class AlphaNet:
 
     def train(self, data, epochs):
         board_train, board_val, policy_train, policy_val, value_train, value_val = \
-            train_test_split(data.board, data.policy, data.value, test_size=0.05)
+            train_test_split(data.board, data.policy, data.value, test_size=0.1)
 
         # load dataset
         train_dataset = tf.data.Dataset.from_tensor_slices(
@@ -82,8 +82,11 @@ class AlphaNet:
 
         val_dataset = val_dataset.batch(32)
 
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+
         # learn on dataset
-        history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset)
+        history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset,
+                                  callbacks=[early_stopping])
 
         # save new model
         self.save_model(history)
