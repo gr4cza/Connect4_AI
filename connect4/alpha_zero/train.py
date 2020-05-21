@@ -31,6 +31,7 @@ def train(turns, hours=0., minutes=0., mcts_turns=300, epochs=10, net_name=None,
             game_data.save(net_name)
 
             print(game_data)
+            del game_data
 
         # load net & train
         p = Process(target=train_net_process, args=(net_name, epochs))

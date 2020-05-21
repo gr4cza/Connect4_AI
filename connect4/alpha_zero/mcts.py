@@ -51,16 +51,16 @@ class MCTS:  # noqa
             node.back_propagate(v)
 
         if train:
-            return self._bets_action(root, train=train), (e_board, self._policy(root))
+            return self._best_action(root, train=train), (e_board, self._policy(root))
         else:
-            return self._bets_action(root, train=train)
+            return self._best_action(root, train=train)
 
     def _search_best_leaf(self, node):
         if None in node.children.values() or len(node.children) == 0:
             return node
         return self._search_best_leaf(max(node.children.values(), key=lambda x: x.PUCT()))
 
-    def _bets_action(self, node, train):
+    def _best_action(self, node, train):
         if self.print_policy:
             print(self._policy(node))
         if not train:

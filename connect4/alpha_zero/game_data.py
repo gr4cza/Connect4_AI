@@ -1,6 +1,7 @@
 import json
 import os
 import pickle
+from os import path
 
 import numpy as np
 from pathlib import Path
@@ -43,21 +44,22 @@ class GameData:
         self._purge()
 
     def load_from_directory(self, name):
-        path = BASE_DIR + f'{name}/'
+        directory = BASE_DIR + f'{name}/'
 
-        last_iter = self._get_last_iteration(path)
+        if path.exists(directory):
+            last_iter = self._get_last_iteration(directory)
 
-        with open(path + f'{last_iter:02}.pkl', 'rb')as file:
-            data = pickle.load(file)
-        self.add_games([data])
+            with open(directory + f'{last_iter:02}.pkl', 'rb')as file:
+                data = pickle.load(file)
+            self.add_games([data])
 
     def save(self, name):
-        path = BASE_DIR + f'{name}/'
-        Path(path).mkdir(parents=True, exist_ok=True)
+        directory = BASE_DIR + f'{name}/'
+        Path(directory).mkdir(parents=True, exist_ok=True)
 
-        last_iter = self._get_last_iteration(path, add=True)
+        last_iter = self._get_last_iteration(directory, add=True)
 
-        with open(path + f'{last_iter:02}.pkl', 'wb')as file:
+        with open(directory + f'{last_iter:02}.pkl', 'wb')as file:
             pickle.dump(self, file)
 
     @property
@@ -73,14 +75,14 @@ class GameData:
         return np.array(self.values)
 
     @staticmethod
-    def _get_last_iteration(path, add=False):
-        if not os.path.exists(path + 'catalog.json'):
-            with open(path + 'catalog.json', 'w')as f:
+    def _get_last_iteration(directory, add=False):
+        if not os.path.exists(directory + 'catalog.json'):
+            with open(directory + 'catalog.json', 'w')as f:
                 data = {'last_item': 0}
                 f.write(json.dumps(data))
                 return data['last_item']
         else:
-            with open(path + 'catalog.json', 'r+')as f:
+            with open(directory + 'catalog.json', 'r+')as f:
                 data = json.load(f)
                 f.seek(0)
                 if add:
