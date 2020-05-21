@@ -165,33 +165,29 @@ def self_play(net, hours, minutes, mcts_turns, multi_process=False):
         board = Board()
         current_player = PLAYER1
 
-        p1_data = GameData()
-        p2_data = GameData()
+        temp_game_data = GameData()
 
         while not board.is_game_over():
             if current_player == PLAYER1:
                 action, (p1_board, p1_policy) = az_1.move(board, train=True)
                 board.add_token(action)
 
-                p1_data.add_play(p1_board, p1_policy)
+                temp_game_data.add_play(p1_board, p1_policy)
                 current_player = PLAYER2
             elif current_player == PLAYER2:
                 action, (p2_board, p2_policy) = az_2.move(board, train=True)
                 board.add_token(action)
 
-                p2_data.add_play(p2_board, p2_policy)
+                temp_game_data.add_play(p2_board, p2_policy)
                 current_player = PLAYER1
         print(board)
 
         winner = board.winner
 
-        p1_v = v_value(winner, PLAYER1)
-        p1_data.add_winner(p1_v)
+        winner_value = v_value(winner)
+        temp_game_data.add_winner(winner_value)
 
-        p2_v = v_value(winner, PLAYER2)
-        p2_data.add_winner(p2_v)
-
-        game_data.add_games([p1_data, p2_data])
+        game_data.add_games([temp_game_data])
 
     if multi_process:
         net.send('Finished')
@@ -255,12 +251,12 @@ def play_against(net, times, mcts_turns, best_first):
         return p2, p1, t
 
 
-def v_value(winner, player):
+def v_value(winner):
     if winner == NO_ONE:
         return np.array([0], dtype=np.float32)
-    if winner == player:
+    if winner == PLAYER1:
         return np.array([1], dtype=np.float32)
-    if winner != player:
+    if winner == PLAYER2:
         return np.array([-1], dtype=np.float32)
 
 

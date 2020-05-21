@@ -25,12 +25,12 @@ class MCTS:  # noqa
 
     def next_move(self, board, train=False):
         if self.multi_process:
-            root = MultiNode(board, self.player, root_player=self.player)
+            root = MultiNode(board, self.player)
         elif self.net_type is not None:
             root = PlayAgainstNode(board, self.player,
-                                   net_type=self.net_type, root_player=self.player)
+                                   net_type=self.net_type)
         else:
-            root = Node(board, self.player, root_player=self.player)
+            root = Node(board, self.player)
 
         e_board = root.compute(self.net, root=True, train=train)
 
@@ -82,11 +82,10 @@ class MCTS:  # noqa
 
 
 class Node:
-    def __init__(self, board, player, root_player, action=-1, parent=None) -> None:
+    def __init__(self, board, player, action=-1, parent=None) -> None:
         self.board = board
         self.player = player
         self.action = action
-        self.root_player = root_player
         self.parent = parent
         self.children = {}
         self.N = 0
@@ -109,12 +108,12 @@ class Node:
         board = deepcopy(self.board)
         board.add_token(column)
         self.children[column] = self.__class__(board, PLAYER1 if self.player == PLAYER2 else PLAYER2,
-                                               action=column, parent=self, root_player=self.root_player)
+                                               action=column, parent=self)
         return self.children[column]
 
     def back_propagate(self, v):
         self.N += 1
-        v1 = -v if self.player == self.root_player else v
+        v1 = -v if self.player == PLAYER1 else v
         self.W += v1
         if self.parent:
             self.parent.back_propagate(v)
@@ -143,7 +142,7 @@ class Node:
     @staticmethod
     def _add_dirichlet_noise(p):
         return (1 - EPSILON) * p + \
-               EPSILON * np.random.dirichlet([0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3])
+               EPSILON * np.random.dirichlet([0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
 
 
 class MultiNode(Node):
@@ -157,8 +156,8 @@ class MultiNode(Node):
 
 class PlayAgainstNode(Node):
 
-    def __init__(self, board, player, root_player, action=-1, parent=None, net_type=None) -> None:
-        super().__init__(board, player, root_player, action, parent)
+    def __init__(self, board, player, action=-1, parent=None, net_type=None) -> None:
+        super().__init__(board, player, action, parent)
         self.net_type = net_type
 
     def _predict(self, e_board, net):
@@ -172,7 +171,6 @@ class PlayAgainstNode(Node):
         board = deepcopy(self.board)
         board.add_token(column)
         self.children[column] = self.__class__(board, PLAYER1 if self.player == PLAYER2 else PLAYER2,
-                                               root_player=self.root_player,
                                                action=column,
                                                parent=self,
                                                net_type=self.net_type)

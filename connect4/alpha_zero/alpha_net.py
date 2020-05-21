@@ -82,7 +82,7 @@ class AlphaNet:
 
         val_dataset = val_dataset.batch(32)
 
-        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+        early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True)
 
         # learn on dataset
         history = self._model.fit(train_dataset, epochs=epochs, verbose=2, validation_data=val_dataset,
