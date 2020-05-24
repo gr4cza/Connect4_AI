@@ -114,7 +114,7 @@ def evaluate(net_name, times, mcts_turns):
 
     with mp.Pool(processes=THREAD_COUNT)as pool:
         data = pool.starmap(play_against,
-                            [(pi[1], times_per_process, mcts_turns, idx > (THREAD_COUNT / 2))
+                            [(pi[1], times_per_process, mcts_turns, idx >= (THREAD_COUNT / 2))
                              for idx, pi in enumerate(pipes)])
         pool.close()
         pool.join()
@@ -205,6 +205,8 @@ def play_against(net, times, mcts_turns, best_first):
 
     if best_first:
         player_1, player_2 = player_2, player_1
+        player_1.mcts.player = PLAYER1
+        player_2.mcts.player = PLAYER2
 
     p1, p2, t = 0, 0, 0
 
