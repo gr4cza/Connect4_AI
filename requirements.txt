@@ -2,7 +2,7 @@ tensorflow==2.5.0
 numpy==1.18.1
 gmpy2==2.0.8
 
-tensorflow-gpu==2.1.2
+tensorflow-gpu==2.5.0
 pygame>=1.9.6
 scipy==1.4.1
 pandas==1.0.3
